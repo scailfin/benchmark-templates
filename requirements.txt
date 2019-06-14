@@ -1,0 +1,4 @@
+future
+gitpython
+jsonschema
+pyyaml>=5.1
