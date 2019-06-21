@@ -267,7 +267,7 @@ def replace_args(spec, arguments, parameters):
                 # We currently do not support lists of lists
                 raise err.InvalidTemplateError('nested lists not supported')
             obj.append(replace_args(val, arguments, parameters))
-    elif isinstance(spec, str):
+    elif isinstance(spec, str) or isinstance(spec, basestring):
         obj = replace_value(spec, arguments, parameters)
     else:
         obj = spec
