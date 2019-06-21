@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Simple scanner classes to collect values (e.g., for template parameters)
 from different sources (e.g. standard input). The Scanner class implements the
 methods that are used to convert input values into the different data types

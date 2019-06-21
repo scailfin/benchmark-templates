@@ -12,7 +12,7 @@ from benchtmpl.workflow.template.base import TemplateHandle
 from benchtmpl.workflow.template.repo import TemplateRepository
 
 import benchtmpl.error as err
-import benchtmpl.backend.reana.util as reana
+import benchtmpl.backend.util as backend
 
 
 DATA_FILE = './tests/files/workflows/helloworld/data/names.txt'
@@ -81,8 +81,9 @@ class TestFileCopy(TestCase):
         run_dir = os.path.join(TMP_DIR, 'run')
         os.makedirs(run_dir)
         # Copy input files to run directory
-        reana.upload_files(
+        backend.upload_files(
             template=template,
+            files=template.workflow_spec.get('inputs', {}).get('files', []),
             arguments={
                 'names': TemplateArgument(
                     template.get_parameter('names'),
@@ -116,8 +117,9 @@ class TestFileCopy(TestCase):
         self.assertTrue('Joe Bloggs' in friends)
         # Error cases
         with self.assertRaises(err.MissingArgumentError):
-            reana.upload_files(
+            backend.upload_files(
                 template=template,
+                files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={},
                 loader=FileCopy(run_dir)
             )
@@ -129,8 +131,9 @@ class TestFileCopy(TestCase):
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
         with self.assertRaises(IOError):
-            reana.upload_files(
+            backend.upload_files(
                 template=template,
+                files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={
                     'names': TemplateArgument(
                         template.get_parameter('names'),
@@ -146,8 +149,9 @@ class TestFileCopy(TestCase):
         para.as_constant = None
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
-        reana.upload_files(
+        backend.upload_files(
             template=template,
+            files=template.workflow_spec.get('inputs', {}).get('files', []),
             arguments={
                 'names': TemplateArgument(
                     parameter=para,
@@ -173,8 +177,9 @@ class TestFileCopy(TestCase):
         os.makedirs(run_dir)
         # Copy input files to run directory
         with self.assertRaises(err.InvalidTemplateError):
-            reana.upload_files(
+            backend.upload_files(
                 template=template,
+                files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={
                     'sleeptime': TemplateArgument(
                         template.get_parameter('names'),

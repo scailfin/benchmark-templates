@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Simple implementation for a backend workflow execution engine. This engine
 runs each workflow as a subprocess.
 
@@ -18,7 +26,7 @@ from benchtmpl.backend.multiprocess.io import FileCopy
 from benchtmpl.workflow.resource.base import FileResource
 
 import benchtmpl.backend.multiprocess.task as tasks
-import benchtmpl.backend.reana.util as reana
+import benchtmpl.backend.util as backend
 import benchtmpl.error as err
 import benchtmpl.util.core as util
 import benchtmpl.workflow.state as wf
@@ -108,8 +116,9 @@ class MultiProcessWorkflowEngine(object):
         # run folder.
         try:
             # Copy all required code and input files
-            reana.upload_files(
+            backend.upload_files(
                 template=template,
+                files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments=arguments,
                 loader=FileCopy(run_dir)
             )

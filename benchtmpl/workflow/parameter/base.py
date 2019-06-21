@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Base class for workflow template parameters. Each parameter has a set of
 properties that are used to (i) identify the parameter, (ii) define a nested
 parameter structure, and (iii) render UI forms to collect parameter values.

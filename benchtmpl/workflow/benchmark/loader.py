@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Implementation of the template loader for benchmark workflow templates. A
 benchmark template has one additional element in its serialization that contains
 the specification of the result schema.

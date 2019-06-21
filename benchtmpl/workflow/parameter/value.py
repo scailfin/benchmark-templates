@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """The template argument class is used to represent user-provided values for
 workflow template parameters. The class is a simple wrapper that combines
 the value and the meta-data in the parameter declaration.
