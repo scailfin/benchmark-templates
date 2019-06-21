@@ -1,13 +1,6 @@
 benchtmpl.backend package
 =========================
 
-Subpackages
------------
-
-.. toctree::
-
-   benchtmpl.backend.multiprocess
-
 Submodules
 ----------
 

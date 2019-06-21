@@ -5,7 +5,7 @@ import shutil
 
 from unittest import TestCase
 
-from benchtmpl.backend.multiprocess.io import FileCopy
+from benchtmpl.backend.util import FileCopy
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.value import TemplateArgument
 from benchtmpl.workflow.template.base import TemplateHandle

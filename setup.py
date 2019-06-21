@@ -27,7 +27,7 @@ extras_require = {
 
 setup(
     name='benchmark-templates',
-    version='0.1.0',
+    version='0.1.1',
     description='Workflow Templates for Reproducible Data Analysis Benchmarks',
     keywords='reproducibility benchmarks data analysis',
     license='MIT',
