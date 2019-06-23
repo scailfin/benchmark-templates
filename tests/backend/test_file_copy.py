@@ -5,14 +5,14 @@ import shutil
 
 from unittest import TestCase
 
-from benchtmpl.backend.util import FileCopy
+from benchtmpl.backend.files import FileCopy
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.value import TemplateArgument
 from benchtmpl.workflow.template.base import TemplateHandle
 from benchtmpl.workflow.template.repo import TemplateRepository
 
 import benchtmpl.error as err
-import benchtmpl.backend.util as backend
+import benchtmpl.backend.files as backend
 
 
 DATA_FILE = './tests/files/workflows/helloworld/data/names.txt'

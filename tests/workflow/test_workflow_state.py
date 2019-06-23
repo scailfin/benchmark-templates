@@ -4,7 +4,10 @@ import datetime as dt
 
 from unittest import TestCase
 
-from benchtmpl.workflow.state import StateError, StatePending, StateRunning, StateSuccess
+from benchtmpl.workflow.state import (
+    StateError, StatePending, StateRunning, StateSuccess, WorkflowState,
+    LABEL_STATE_TYPE
+)
 from benchtmpl.workflow.resource.base import FileResource
 
 
@@ -13,6 +16,11 @@ LOCAL_FILE = 'tests/files/schema.json'
 
 class TestWorkflowStates(TestCase):
     """Test instantiating the different workflow state classes."""
+    def test_deserialize_error(self):
+        """Test error when deserializing document with invalid type."""
+        with self.assertRaises(ValueError):
+            WorkflowState.from_dict({LABEL_STATE_TYPE: 'unknown'})
+
     def test_error_state(self):
         """Test creating instances of the error state class."""
         created_at = dt.datetime.now()
@@ -42,6 +50,17 @@ class TestWorkflowStates(TestCase):
         self.assertEqual(state.started_at, started_at)
         self.assertEqual(state.stopped_at, stopped_at)
         self.assertEqual(len(state.messages), 3)
+        # Test serialization and deserialization
+        state = WorkflowState.from_dict(state.to_dict())
+        self.assertTrue(state.is_error())
+        self.assertFalse(state.is_pending())
+        self.assertFalse(state.is_running())
+        self.assertFalse(state.is_success())
+        self.assertFalse(state.is_active())
+        self.assertEqual(state.created_at, created_at)
+        self.assertEqual(state.started_at, started_at)
+        self.assertEqual(state.stopped_at, stopped_at)
+        self.assertEqual(len(state.messages), 3)
 
     def test_pending_state(self):
         """Test creating instances of the pending state class."""
@@ -56,6 +75,14 @@ class TestWorkflowStates(TestCase):
         running = state.start()
         self.assertEqual(state.created_at, running.created_at)
         self.assertIsNotNone(running.started_at)
+        # Test serialization and deserialization
+        state = WorkflowState.from_dict(state.to_dict())
+        self.assertTrue(state.is_pending())
+        self.assertTrue(state.is_active())
+        self.assertFalse(state.is_error())
+        self.assertFalse(state.is_running())
+        self.assertFalse(state.is_success())
+        self.assertEqual(state.created_at, created_at)
 
     def test_running_state(self):
         """Test creating instances of the running state class."""
@@ -76,6 +103,26 @@ class TestWorkflowStates(TestCase):
         self.assertEqual(len(error.messages), 2)
         self.assertEqual(error.messages[0], 'Error')
         self.assertEqual(error.messages[1], 'State')
+        success = state.success(
+            resources={'myfile': FileResource('myfile', LOCAL_FILE)}
+        )
+        self.assertTrue(success.is_success())
+        self.assertFalse(success.is_error())
+        self.assertFalse(success.is_pending())
+        self.assertFalse(success.is_running())
+        self.assertFalse(success.is_active())
+        self.assertEqual(success.created_at, state.created_at)
+        self.assertEqual(success.started_at, state.started_at)
+        self.assertEqual(len(success.resources), 1)
+        # Test serialization and deserialization
+        state = WorkflowState.from_dict(state.to_dict())
+        self.assertTrue(state.is_active())
+        self.assertTrue(state.is_running())
+        self.assertFalse(state.is_pending())
+        self.assertFalse(state.is_error())
+        self.assertFalse(state.is_success())
+        self.assertEqual(state.created_at, created_at)
+        self.assertEqual(state.started_at, started_at)
 
     def test_success_state(self):
         """Test creating instances of the success state class."""
@@ -106,7 +153,25 @@ class TestWorkflowStates(TestCase):
         self.assertEqual(state.started_at, started_at)
         self.assertEqual(state.finished_at, finished_at)
         self.assertEqual(len(state.resources), 1)
-
+        # Test serialization and deserialization
+        state = WorkflowState.from_dict(state.to_dict())
+        self.assertTrue(state.is_success())
+        self.assertFalse(state.is_error())
+        self.assertFalse(state.is_pending())
+        self.assertFalse(state.is_running())
+        self.assertFalse(state.is_active())
+        self.assertEqual(state.created_at, created_at)
+        self.assertEqual(state.started_at, started_at)
+        self.assertEqual(state.finished_at, finished_at)
+        self.assertEqual(len(state.resources), 1)
+        # Error when passing invalid resource object
+        with self.assertRaises(ValueError):
+            StateSuccess(
+                created_at=created_at,
+                started_at=started_at,
+                finished_at=finished_at,
+                resources=FileResource('myfile', LOCAL_FILE)
+            )
 
 if __name__ == '__main__':
     import unittest

@@ -29,6 +29,7 @@ RESOURCE_FILE = 'file'
 
 
 """Element labels for serialization of resource descriptors."""
+LABEL_FILEPATH = 'filepath'
 LABEL_ID = 'id'
 LABEL_TYPE = 'type'
 
@@ -74,17 +75,14 @@ class ResourceDescriptor(object):
 
         Raises
         ------
-        ValueError
+        benchtmpl.error.InvalidTemplateError
         """
-        # Expect exactly two elements in the dictionary
-        if len(doc) != 2:
-            raise InvalidTemplateError('invalid resource descriptor serialization')
         if not (LABEL_ID in doc and LABEL_TYPE in doc):
             raise InvalidTemplateError('invalid resource descriptor serialization')
-        return ResourceDescriptor(
-            identifier=doc[LABEL_ID],
-            type_id=doc[LABEL_TYPE]
-        )
+        if doc[LABEL_TYPE] == RESOURCE_FILE:
+            return FileResource.from_dict(doc)
+        else:
+            raise ValueError('unknown resource type \'{}\''.format(type_id))
 
     def to_dict(self):
         """Create dictionary serialization of the resource descriptor
@@ -120,3 +118,48 @@ class FileResource(ResourceDescriptor):
             type_id=RESOURCE_FILE
         )
         self.filepath = filepath
+
+    @staticmethod
+    def from_dict(doc):
+        """Get instance of the file resource descriptor from a dictionary
+        serialization as created by the to_dict() method. Expects a dictionary
+        with three elements 'id', 'type.' and 'filepath'.
+
+        Raises an error if an invalid dictionary is given.
+
+        Parameters
+        ----------
+        doc: dict
+            Dictionary serialization of a file resource descriptor
+
+        Returns
+        -------
+        benchtmpl.workflow.resource.base.FileResource
+
+        Raises
+        ------
+        ValueError
+        """
+        # Expect exactly three elements in the dictionary
+        if len(doc) != 3:
+            raise ValueError('invalid file resource descriptor')
+        if not (LABEL_ID in doc and LABEL_TYPE in doc and LABEL_FILEPATH in doc):
+            raise ValueError('invalid file resource descriptor')
+        if doc[LABEL_TYPE] != RESOURCE_FILE:
+            raise ValueError('invalid file resource descriptor')
+        return FileResource(
+            identifier=doc[LABEL_ID],
+            filepath=doc[LABEL_FILEPATH]
+        )
+
+    def to_dict(self):
+        """Create dictionary serialization of the file resource. Extends the
+        descriptor serialization with the file path.
+
+        Returns
+        -------
+        dict
+        """
+        obj = super(FileResource, self).to_dict()
+        obj[LABEL_FILEPATH] = self.filepath
+        return obj

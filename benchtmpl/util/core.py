@@ -11,6 +11,7 @@ read and write files in JSON and YAML format and for the creation of unique
 identifiers.
 """
 
+import datetime
 import errno
 import json
 import os
@@ -97,6 +98,25 @@ def read_object(filename, format=None):
             return json.load(f)
     else:
         raise ValueError('unknown data format \'' + str(format) + '\'')
+
+
+def to_datetime(timestamp):
+    """Converts a timestamp string in ISO format into a datatime object.
+
+    Parameters
+    ----------
+    timstamp : string
+        Timestamp in ISO format
+
+    Returns
+    -------
+    datatime.datetime
+        Datetime object
+    """
+    try:
+        return datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
+    except ValueError:
+        return datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
 
 
 def write_object(filename, obj, format=None):

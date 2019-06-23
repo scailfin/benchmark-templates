@@ -8,12 +8,9 @@
 
 include LICENSE
 include *.rst
-include *.sh
-include *.yaml
 recursive-include benchtmpl *.py
 prune docs/_build
 recursive-include docs *.py
-recursive-include docs *.png
 recursive-include docs *.rst
 recursive-include tests *.py
-global-exclude *.py[co] .DS_Store
+global-exclude *.py[co]

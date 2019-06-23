@@ -39,7 +39,7 @@ class WorkflowEngine(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def exec(self, template, arguments):
+    def execute(self, template, arguments):
         """Execute a given workflow template for a set of argument values.
         Returns an unique identifier for the started workflow run.
 

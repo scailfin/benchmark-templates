@@ -29,14 +29,14 @@ extras_require = {
 
 setup(
     name='benchmark-templates',
-    version='0.1.1',
+    version='0.1.2',
     description='Workflow Templates for Reproducible Data Analysis Benchmarks',
     long_description=readme,
     long_description_content_type='text/x-rst',
     keywords='reproducibility benchmarks data analysis',
     url='https://github.com/scailfin/benchmark-templates',
-    author="Heiko Mueller",
-    author_email="heiko.muller@gmail.com",
+    author='Heiko Mueller',
+    author_email='heiko.muller@gmail.com',
     license='MIT',
     packages=['benchtmpl'],
     include_package_data=True,
