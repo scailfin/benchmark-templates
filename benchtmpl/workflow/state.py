@@ -255,6 +255,31 @@ class StatePending(WorkflowState):
         """
         return StatePending(created_at=util.to_datetime(doc[LABEL_CREATED_AT]))
 
+    def error(self, messages=None):
+        """Get instance of error state for a pending wokflow. If the exception
+        that caused the workflow execution to terminate is given it will be used
+        to create the list of error messages.
+
+        Since the workflow did not start to run the started_at timestamp is set
+        to the current time just like the stopped_at timestamp.
+
+        Parameters
+        ----------
+        messages: list(string), optional
+            Optional list of error messages
+
+        Returns
+        -------
+        benchtmpl.workflow.state.StateError
+        """
+        ts = datetime.now()
+        return StateError(
+            created_at=self.created_at,
+            started_at=ts,
+            stopped_at=ts,
+            messages=messages
+        )
+
     def start(self):
         """Get instance of running state with the same create at timestamp as
         this state and the started at with the current timestamp.
