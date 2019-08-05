@@ -1,9 +1,8 @@
 """Test various methods that copy input and output files for workflow runs."""
 
 import os
+import pytest
 import shutil
-
-from unittest import TestCase
 
 from benchtmpl.backend.files import FileCopy
 from benchtmpl.io.files.base import FileHandle
@@ -15,70 +14,60 @@ import benchtmpl.error as err
 import benchtmpl.backend.files as backend
 
 
-DATA_FILE = './tests/files/workflows/helloworld/data/names.txt'
-TMP_DIR = './tests/files/.tmp'
-INPUT_DIR = './tests/files/workflows/helloworld'
-INPUT_FILE = './tests/files/schema.json'
-SPEC_FILE = 'alt-template.yaml'
-SPEC_FILE_ERR = 'alt-error.yaml'
-WORKFLOW_DIR = './tests/files/template'
+DIR = os.path.dirname(os.path.realpath(__file__))
+DATA_FILE = os.path.join(DIR, '../.files/workflows/helloworld/data/names.txt')
+INPUT_DIR = os.path.join(DIR, '../.files/workflows/helloworld')
+INPUT_FILE = os.path.join(DIR, '../.files/schema.json')
+WORKFLOW_DIR = os.path.join(DIR, '../.files/template')
+
+SPEC_FILE = os.path.join(WORKFLOW_DIR, 'alt-template.yaml')
+SPEC_FILE_ERR = os.path.join(WORKFLOW_DIR, 'alt-error.yaml')
 
 
-class TestFileCopy(TestCase):
+class TestFileCopy(object):
     """Test copying files on local disk for workflow run preparation."""
-    def setUp(self):
-        """Create an empty target directory for each test and intitialize the
-        file loader function.
-        """
-        self.tearDown()
-        os.makedirs(TMP_DIR)
-        self.loader = FileCopy(TMP_DIR)
-
-    def tearDown(self):
-        """Remove the temporary target directory."""
-        if os.path.isdir(TMP_DIR):
-            shutil.rmtree(TMP_DIR)
-
-    def test_input_dir_copy(self):
+    def test_input_dir_copy(self, tmpdir):
         """Test copying local directories into a workflow run directory."""
         # Copy file to target directory
-        self.loader(source=INPUT_DIR, target='workflow')
-        dirname = os.path.join(TMP_DIR, 'workflow')
-        self.assertTrue(os.path.isdir(dirname))
-        self.assertTrue(os.path.isdir(os.path.join(dirname, 'code')))
+        loader = FileCopy(tmpdir)
+        loader(source=INPUT_DIR, target='workflow')
+        dirname = os.path.join(tmpdir, 'workflow')
+        assert os.path.isdir(dirname)
+        assert os.path.isdir(os.path.join(dirname, 'code'))
         datadir = os.path.join(dirname, 'data')
-        self.assertTrue(os.path.isdir(datadir))
-        self.assertTrue(os.path.isfile(os.path.join(datadir, 'names.txt')))
+        assert os.path.isdir(datadir)
+        assert os.path.isfile(os.path.join(datadir, 'names.txt'))
         # Copy to target directory under parent that does not exist
         dst = os.path.join('run', 'files', 'wf')
-        self.loader(source=INPUT_DIR, target=dst)
-        dirname = os.path.join(TMP_DIR, dst)
-        self.assertTrue(os.path.isdir(dirname))
-        self.assertTrue(os.path.isdir(os.path.join(dirname, 'code')))
+        loader(source=INPUT_DIR, target=dst)
+        dirname = os.path.join(tmpdir, dst)
+        assert os.path.isdir(dirname)
+        assert os.path.isdir(os.path.join(dirname, 'code'))
         datadir = os.path.join(dirname, 'data')
-        self.assertTrue(os.path.isdir(datadir))
-        self.assertTrue(os.path.isfile(os.path.join(datadir, 'names.txt')))
+        assert os.path.isdir(datadir)
+        assert os.path.isfile(os.path.join(datadir, 'names.txt'))
 
-    def test_input_file_copy(self):
+    def test_input_file_copy(self, tmpdir):
         """Test copying local input files into a workflow run directory."""
         # Copy file to target directory
-        self.loader(source=INPUT_FILE, target='input.data')
-        self.assertTrue(os.path.isfile(os.path.join(TMP_DIR, 'input.data')))
+        loader = FileCopy(tmpdir)
+        loader(source=INPUT_FILE, target='input.data')
+        assert os.path.isfile(os.path.join(tmpdir, 'input.data'))
         # Copy file to non-existing target directory
         target = os.path.join('data', 'input.data')
-        self.loader(source=INPUT_FILE, target=target)
-        self.assertTrue(os.path.isfile(os.path.join(TMP_DIR, target)))
+        loader(source=INPUT_FILE, target=target)
+        assert os.path.isfile(os.path.join(tmpdir, target))
 
-    def test_prepare_inputs_for_local_run(self):
+    def test_prepare_inputs_for_local_run(self, tmpdir):
         """Test copying input files for a local workflow run."""
         # Load template
-        store = TemplateRepository(base_dir=TMP_DIR)
+        store = TemplateRepository(base_dir=tmpdir)
         template = store.add_template(
             src_dir=WORKFLOW_DIR,
-            template_spec_file=os.path.join(WORKFLOW_DIR, SPEC_FILE)
+            template_spec_file=SPEC_FILE
         )
         # Create run directory
-        run_dir = os.path.join(TMP_DIR, 'run')
+        run_dir = os.path.join(tmpdir, 'run')
         os.makedirs(run_dir)
         # Copy input files to run directory
         backend.upload_files(
@@ -96,27 +85,27 @@ class TestFileCopy(TestCase):
         # code/helloworld.py
         # data/persons.txt
         # data/friends.txt
-        self.assertTrue(os.path.isfile(os.path.join(run_dir, 'code', 'helloworld.py')))
-        self.assertTrue(os.path.isfile(os.path.join(run_dir, 'data', 'persons.txt')))
-        self.assertTrue(os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt')))
+        assert os.path.isfile(os.path.join(run_dir, 'code', 'helloworld.py'))
+        assert os.path.isfile(os.path.join(run_dir, 'data', 'persons.txt'))
+        assert os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt'))
         # data/persons.txt should contain Alice and Bob
         names = set()
         with open(os.path.join(run_dir, 'data', 'persons.txt'), 'r') as f:
             for line in f:
                 names.add(line.strip())
-        self.assertEqual(len(names), 2)
-        self.assertTrue('Alice' in names)
-        self.assertTrue('Bob' in names)
+        assert len(names) == 2
+        assert 'Alice' in names
+        assert 'Bob' in names
         # data/friends contains Jane Doe and Joe Bloggs
         friends = set()
         with open(os.path.join(run_dir, 'data', 'friends.txt'), 'r') as f:
             for line in f:
                 friends.add(line.strip())
-        self.assertEqual(len(friends), 2)
-        self.assertTrue('Jane Doe' in friends)
-        self.assertTrue('Joe Bloggs' in friends)
+        assert len(friends) == 2
+        assert 'Jane Doe' in friends
+        assert 'Joe Bloggs' in friends
         # Error cases
-        with self.assertRaises(err.MissingArgumentError):
+        with pytest.raises(err.MissingArgumentError):
             backend.upload_files(
                 template=template,
                 files=template.workflow_spec.get('inputs', {}).get('files', []),
@@ -126,23 +115,23 @@ class TestFileCopy(TestCase):
         # Error when copying non-existing file
         template = store.add_template(
             src_dir=WORKFLOW_DIR,
-            template_spec_file=os.path.join(WORKFLOW_DIR, SPEC_FILE)
+            template_spec_file=SPEC_FILE
         )
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
-        with self.assertRaises(IOError):
+        with pytest.raises(IOError):
             backend.upload_files(
                 template=template,
                 files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={
                     'names': TemplateArgument(
                         template.get_parameter('names'),
-                        value=FileHandle(filepath=os.path.join(TMP_DIR, 'no.file'))
+                        value=FileHandle(filepath=os.path.join(tmpdir, 'no.file'))
                     )
                 },
                 loader=FileCopy(run_dir)
             )
-        self.assertFalse(os.path.isdir(os.path.join(run_dir, 'data')))
+        assert not os.path.isdir(os.path.join(run_dir, 'data'))
         # If the constant value for the names parameter is removed the names
         # file is copied to the run directory and not to the data folder
         para = template.get_parameter('names')
@@ -164,19 +153,19 @@ class TestFileCopy(TestCase):
         # code/helloworld.py
         # names.txt
         # data/friends.txt
-        self.assertTrue(os.path.isfile(os.path.join(run_dir, 'code', 'helloworld.py')))
-        self.assertTrue(os.path.isfile(os.path.join(run_dir, 'names.txt')))
-        self.assertFalse(os.path.isfile(os.path.join(run_dir, 'data', 'persons.txt')))
-        self.assertTrue(os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt')))
+        assert os.path.isfile(os.path.join(run_dir, 'code', 'helloworld.py'))
+        assert os.path.isfile(os.path.join(run_dir, 'names.txt'))
+        assert not os.path.isfile(os.path.join(run_dir, 'data', 'persons.txt'))
+        assert os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt'))
         # Template with input file parameter that is not of type file
         template = store.add_template(
             src_dir=WORKFLOW_DIR,
-            template_spec_file=os.path.join(WORKFLOW_DIR, SPEC_FILE_ERR)
+            template_spec_file=SPEC_FILE_ERR
         )
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
         # Copy input files to run directory
-        with self.assertRaises(err.InvalidTemplateError):
+        with pytest.raises(err.InvalidTemplateError):
             backend.upload_files(
                 template=template,
                 files=template.workflow_spec.get('inputs', {}).get('files', []),
@@ -188,8 +177,3 @@ class TestFileCopy(TestCase):
                 },
                 loader=FileCopy(run_dir)
             )
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

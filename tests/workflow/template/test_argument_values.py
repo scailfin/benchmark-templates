@@ -1,7 +1,7 @@
 """Test functionality of the template arguments modules."""
 
-from unittest import TestCase
-
+import os
+import pytest
 
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.base import TemplateParameter
@@ -13,10 +13,11 @@ import benchtmpl.workflow.parameter.value as values
 import benchtmpl.workflow.template.loader as tmpl
 
 
-LOCAL_FILE = 'tests/files/schema.json'
+DIR = os.path.dirname(os.path.realpath(__file__))
+LOCAL_FILE = os.path.join(DIR, '../../.files/schema.json')
 
 
-class TestArgumentValues(TestCase):
+class TestArgumentValues(object):
     """Test parsing and validating argument values for parameterized workflow
     templates.
     """
@@ -41,41 +42,41 @@ class TestArgumentValues(TestCase):
             parameters=params,
             validate=True
         )
-        self.assertEqual(len(args), 5)
+        assert len(args) == 5
         for key in params.keys():
-            self.assertTrue(key in args)
+            assert key in args
         values.parse_arguments(arguments=args, parameters=params, validate=False)
         # Error cases
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(arguments={'A': 10, 'Z': 0}, parameters=params)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(arguments={'A': 10, 'B': True}, parameters=params)
         # Validate data type
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(
                 arguments={'A': '10', 'B': True, 'C': 12.3, 'D': fh, 'E': 'ABC'},
                 parameters=params,
                 validate=True
             )
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(
                 arguments={'A': 10, 'B': 23, 'C': 12.3, 'D': fh, 'E': 'ABC'},
                 parameters=params,
                 validate=True
             )
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(
                 arguments={'A': 10, 'B': True, 'C': '12.3', 'D': fh, 'E': 'ABC'},
                 parameters=params,
                 validate=True
             )
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(
                 arguments={'A': 10, 'B': True, 'C': 12.3, 'D': 'fh', 'E': 'ABC'},
                 parameters=params,
                 validate=True
             )
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(
                 arguments={'A': 10, 'B': True, 'C': 12.3, 'D': fh, 'E': 12},
                 parameters=params,
@@ -105,11 +106,11 @@ class TestArgumentValues(TestCase):
             parameters=params,
             validate=True
         )
-        self.assertEqual(len(args), 2)
-        self.assertTrue(args['B'].has('C'))
-        self.assertFalse(args['B'].has('D'))
-        self.assertEqual(args['B'].len(), 1)
-        self.assertEqual(args['B'].get('C').value, 12.3)
+        assert len(args) == 2
+        assert args['B'].has('C')
+        assert not args['B'].has('D')
+        assert args['B'].len() == 1
+        assert args['B'].get('C').value == 12.3
         # With list arguments
         args = values.parse_arguments(
             arguments={
@@ -124,18 +125,18 @@ class TestArgumentValues(TestCase):
             parameters=params,
             validate=True
         )
-        self.assertEqual(len(args), 3)
-        self.assertTrue(args['B'].has('C'))
-        self.assertTrue(args['B'].has('D'))
-        self.assertEqual(args['B'].len(), 2)
-        self.assertEqual(args['E'].len(), 3)
+        assert len(args) == 3
+        assert args['B'].has('C')
+        assert args['B'].has('D')
+        assert args['B'].len() == 2
+        assert args['E'].len() == 3
         for arg in args['E'].value:
             if arg.get('F').value < 3:
-                self.assertEqual(len(arg), 1)
+                assert len(arg) == 1
             else:
-                self.assertEqual(len(arg), 2)
+                assert len(arg) == 2
         # Error cases
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.parse_arguments(
                 arguments={'A': 10, 'B': [{'C': 12.3}]},
                 parameters=params,
@@ -146,11 +147,11 @@ class TestArgumentValues(TestCase):
         """Test error cases for argument validation."""
         para_list = TemplateParameter(pd.parameter_declaration('E', data_type=pd.DT_LIST))
         values.TemplateArgument(parameter=para_list, value=1)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.TemplateArgument(parameter=para_list, value=1, validate=True)
         para_record = TemplateParameter(pd.parameter_declaration('E', data_type=pd.DT_RECORD))
         values.TemplateArgument(parameter=para_record, value=list())
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             values.TemplateArgument(parameter=para_record, value=list(), validate=True)
         arg = values.TemplateArgument(
             parameter=TemplateParameter(pd.parameter_declaration('E', data_type=pd.DT_INTEGER)),
@@ -158,10 +159,5 @@ class TestArgumentValues(TestCase):
             validate=True
         )
         arg.data_type = 'unknown'
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             arg.validate()
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()

@@ -1,7 +1,6 @@
 """Test read arguments function for REANA templates."""
 
-
-from unittest import TestCase
+import pytest
 
 from benchtmpl.io.scanner import Scanner, ListReader
 from benchtmpl.workflow.parameter.base import TemplateParameter
@@ -11,7 +10,7 @@ import benchtmpl.workflow.parameter.declaration as pd
 import benchtmpl.workflow.template.util as tmpl
 
 
-class TestReadTemplateArguments(TestCase):
+class TestReadTemplateArguments(object):
     def test_read_with_record(self):
         """Read argument for a template that contains a parameter of data type
         DT_RECORD.
@@ -60,13 +59,8 @@ class TestReadTemplateArguments(TestCase):
         )
         sc = Scanner(reader=ListReader(['ABC.txt', 3, True, 'XYZ', 0.123]))
         arguments = tmpl.read(template.list_parameters(), scanner=sc)
-        self.assertEqual(arguments['codeFile'].name, 'ABC.txt')
-        self.assertEqual(arguments['sleeptime'], 3)
-        self.assertEqual(arguments['verbose'], True)
-        self.assertEqual(arguments['outputType'], 'XYZ')
-        self.assertEqual(arguments['frac'], 0.123)
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
+        assert arguments['codeFile'].name == 'ABC.txt'
+        assert arguments['sleeptime'] == 3
+        assert arguments['verbose']
+        assert arguments['outputType'] == 'XYZ'
+        assert arguments['frac'] == 0.123

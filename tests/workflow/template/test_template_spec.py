@@ -1,6 +1,7 @@
 """Test TemplateHandle functionality."""
 
-from unittest import TestCase
+import os
+import pytest
 
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.base import TemplateParameter
@@ -14,17 +15,18 @@ import benchtmpl.workflow.template.base as tmpl
 import benchtmpl.workflow.template.loader as loader
 
 
-TEMPLATE_JSON_FILE = 'tests/files/template/template.json'
-TEMPLATE_YAML_FILE = 'tests/files/template/template.yaml'
-TEMPLATE_ERR = './tests/files/template-error-2.yaml'
+DIR = os.path.dirname(os.path.realpath(__file__))
+TEMPLATE_JSON_FILE = os.path.join(DIR, '../../.files/template/template.json')
+TEMPLATE_YAML_FILE = os.path.join(DIR, '../../.files/template/template.yaml')
+TEMPLATE_ERR = os.path.join(DIR, '../../.files/template-error-2.yaml')
 
 
-class TestTemplateHandle(TestCase):
+class TestTemplateHandle(object):
     def test_duplicate_id(self):
         """Ensure that exception is raised if parameter identifier are not
         unique.
         """
-        with self.assertRaises(err.InvalidTemplateError):
+        with pytest.raises(err.InvalidTemplateError):
             DefaultTemplateLoader().from_dict({
                     loader.LABEL_WORKFLOW: dict(),
                     loader.LABEL_PARAMETERS: [
@@ -52,14 +54,14 @@ class TestTemplateHandle(TestCase):
             'G': ['$[[V]]', 123]
         }
         refs = tmpl.get_parameter_references(spec)
-        self.assertEqual(refs, set(['U', 'V', 'W', 'X', 'Y', 'Z']))
+        assert refs == set(['U', 'V', 'W', 'X', 'Y', 'Z'])
         # If given parameter set as argument the elements in that set are part
         # of the result
         para = set(['A', 'B', 'X'])
         refs = tmpl.get_parameter_references(spec, parameters=para)
-        self.assertEqual(refs, set(['A', 'B', 'U', 'V', 'W', 'X', 'Y', 'Z']))
+        assert refs == set(['A', 'B', 'U', 'V', 'W', 'X', 'Y', 'Z'])
         # Error if specification contains nested lists
-        with self.assertRaises(err.InvalidTemplateError):
+        with pytest.raises(err.InvalidTemplateError):
             tmpl.get_parameter_references({
                 'input': [
                     'A',
@@ -68,7 +70,7 @@ class TestTemplateHandle(TestCase):
                 ]
             })
         # Error when loading specification that references undefined parameter
-        with self.assertRaises(err.UnknownParameterError):
+        with pytest.raises(err.UnknownParameterError):
             template = DefaultTemplateLoader().load(TEMPLATE_ERR, validate=True)
 
     def test_init(self):
@@ -82,8 +84,8 @@ class TestTemplateHandle(TestCase):
                 TemplateParameter(pd.parameter_declaration('B'))
             ]
         )
-        self.assertIsNotNone(th.identifier)
-        self.assertIsNone(th.base_dir)
+        assert not th.identifier is None
+        assert th.base_dir is None
         th = TemplateHandle(
             identifier='ABC',
             base_dir='XYZ',
@@ -93,9 +95,9 @@ class TestTemplateHandle(TestCase):
                 TemplateParameter(pd.parameter_declaration('B'))
             ]
         )
-        self.assertEqual(th.identifier, 'ABC')
-        self.assertEqual(th.base_dir, 'XYZ')
-        with self.assertRaises(err.InvalidTemplateError):
+        assert th.identifier == 'ABC'
+        assert th.base_dir == 'XYZ'
+        with pytest.raises(err.InvalidTemplateError):
             TemplateHandle(
                 workflow_spec=dict(),
                 parameters=[
@@ -124,18 +126,18 @@ class TestTemplateHandle(TestCase):
         )
         # Parameters 'A', 'C', 'D', and 'F' have no children
         for key in ['A', 'C', 'D', 'F']:
-            self.assertFalse(template.get_parameter(key).has_children())
+            assert not template.get_parameter(key).has_children()
         # Parameter 'B' has two children 'C' and 'D'
         b = template.get_parameter('B')
-        self.assertTrue(b.has_children())
-        self.assertEqual(len(b.children), 2)
-        self.assertTrue('C' in [p.identifier for p in b.children])
-        self.assertTrue('D' in [p.identifier for p in b.children])
+        assert b.has_children()
+        assert len(b.children) == 2
+        assert 'C' in [p.identifier for p in b.children]
+        assert 'D' in [p.identifier for p in b.children]
         # Parameter 'E' has one childr 'F'
         e = template.get_parameter('E')
-        self.assertTrue(e.has_children())
-        self.assertEqual(len(e.children), 1)
-        self.assertTrue('F' in [p.identifier for p in e.children])
+        assert e.has_children()
+        assert len(e.children) == 1
+        assert 'F' in [p.identifier for p in e.children]
 
     def test_serialization(self):
         """Test serialization of workflow templates."""
@@ -151,18 +153,18 @@ class TestTemplateHandle(TestCase):
         )
         doc = DefaultTemplateLoader().to_dict(template)
         parameters = DefaultTemplateLoader().from_dict(doc).parameters
-        self.assertTrue(len(parameters), 2)
-        self.assertTrue('A' in parameters)
-        self.assertTrue('B' in parameters)
-        self.assertEqual(len(parameters['B'].children), 1)
+        assert len(parameters) == 3
+        assert 'A' in parameters
+        assert 'B' in parameters
+        assert len(parameters['B'].children) == 1
         template = DefaultTemplateLoader().from_dict(doc)
-        self.assertEqual(template.identifier, 'ABC')
+        assert template.identifier == 'ABC'
         # The base directory is not materialized
-        self.assertIsNone(template.base_dir)
+        assert template.base_dir is None
         # Invalid resource descriptor serializations
-        with self.assertRaises(err.InvalidTemplateError):
+        with pytest.raises(err.InvalidTemplateError):
             ResourceDescriptor.from_dict(dict())
-        with self.assertRaises(err.InvalidTemplateError):
+        with pytest.raises(err.InvalidTemplateError):
             ResourceDescriptor.from_dict({LABEL_ID: 'A', 'noname': 'B'})
 
     def test_simple_replace(self):
@@ -189,12 +191,12 @@ class TestTemplateHandle(TestCase):
                 arguments=arguments,
                 parameters=template.parameters
             )
-            self.assertEqual(spec['inputs']['files'][0], 'helloworld.py')
-            self.assertEqual(spec['inputs']['files'][1], 'data/names.txt')
-            self.assertEqual(spec['inputs']['parameters']['helloworld'], 'code/helloworld.py')
-            self.assertEqual(spec['inputs']['parameters']['inputfile'], 'data/names.txt')
-            self.assertEqual(spec['inputs']['parameters']['sleeptime'], 10)
-            self.assertEqual(spec['inputs']['parameters']['waittime'], 5)
+            assert spec['inputs']['files'][0] == 'helloworld.py'
+            assert spec['inputs']['files'][1] == 'data/names.txt'
+            assert spec['inputs']['parameters']['helloworld'] == 'code/helloworld.py'
+            assert spec['inputs']['parameters']['inputfile'] == 'data/names.txt'
+            assert spec['inputs']['parameters']['sleeptime'] == 10
+            assert spec['inputs']['parameters']['waittime'] == 5
 
     def test_sort(self):
         """Test the sort functionality of the template list_parameters method.
@@ -215,9 +217,4 @@ class TestTemplateHandle(TestCase):
         )
         # Get list of sorted parameter identifier from listing
         keys = [p.identifier for p in template.list_parameters()]
-        self.assertEqual(keys, ['B', 'C', 'A', 'E', 'D'])
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
+        assert keys == ['B', 'C', 'A', 'E', 'D']

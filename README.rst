@@ -5,9 +5,9 @@ Workflow Templates for Reproducible for Data Analysis Benchmarks
 .. image:: https://api.travis-ci.org/scailfin/benchmark-templates.svg?branch=master
    :target: https://travis-ci.org/scailfin/benchmark-templates?branch=master
 
-.. image:: https://coveralls.io/repos/github/scailfin/benchmark-templates/badge.svg?branch=master
-   :target: https://coveralls.io/github/scailfin/benchmark-templates?branch=master
-
+.. image:: https://codecov.io/gh/scailfin/benchmark-templates/branch/master/graph/badge.svg
+ :target: https://codecov.io/gh/scailfin/benchmark-templates
+     
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://github.com/scailfin/benchmark-templates/blob/master/LICENSE
 

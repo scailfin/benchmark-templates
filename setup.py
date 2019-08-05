@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 readme = open('README.rst').read()
 
@@ -13,8 +13,9 @@ install_requires=[
 
 tests_require = [
     'coverage>=4.0',
-    'coveralls',
-    'nose'
+    'pytest',
+    'pytest-cov',
+    'tox'
 ]
 
 
@@ -38,10 +39,20 @@ setup(
     author='Heiko Mueller',
     author_email='heiko.muller@gmail.com',
     license='MIT',
-    packages=['benchtmpl'],
+    packages=find_packages(),
     include_package_data=True,
     test_suite='nose.collector',
     extras_require=extras_require,
     tests_require=tests_require,
-    install_requires=install_requires
+    install_requires=install_requires,
+    classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python'
+    ],
 )

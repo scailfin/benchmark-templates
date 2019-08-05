@@ -1,13 +1,13 @@
 """Test benchmark result schema objects."""
 
-from unittest import TestCase
+import pytest
 
 import benchtmpl.workflow.benchmark.schema as schema
 
 import benchtmpl.workflow.parameter.declaration as pd
 
 
-class TestBenchmarkResultSchema(TestCase):
+class TestBenchmarkResultSchema(object):
     def test_column_serialization(self):
         """Test serialization of column objects."""
         # Ensure the required default value is set properly
@@ -16,21 +16,21 @@ class TestBenchmarkResultSchema(TestCase):
             name='Column 1',
             data_type=pd.DT_INTEGER
         )
-        self.assertEqual(col.identifier, 'col_1')
-        self.assertEqual(col.name, 'Column 1')
-        self.assertEqual(col.data_type, pd.DT_INTEGER)
-        self.assertTrue(col.required)
-        self.assertEqual(type(col.required), bool)
-        self.assertFalse(col.is_default)
-        self.assertTrue(col.is_desc())
+        assert col.identifier == 'col_1'
+        assert col.name == 'Column 1'
+        assert col.data_type == pd.DT_INTEGER
+        assert col.required
+        assert type(col.required) == bool
+        assert not col.is_default
+        assert col.is_desc()
         col = schema.BenchmarkResultColumn.from_dict(col.to_dict())
-        self.assertEqual(col.identifier, 'col_1')
-        self.assertEqual(col.name, 'Column 1')
-        self.assertEqual(col.data_type, pd.DT_INTEGER)
-        self.assertTrue(col.required)
-        self.assertEqual(type(col.required), bool)
-        self.assertFalse(col.is_default)
-        self.assertTrue(col.is_desc())
+        assert col.identifier == 'col_1'
+        assert col.name == 'Column 1'
+        assert col.data_type == pd.DT_INTEGER
+        assert col.required
+        assert type(col.required) == bool
+        assert not col.is_default
+        assert col.is_desc()
         # Test serialization if required value is given
         col = schema.BenchmarkResultColumn(
             identifier='col_1',
@@ -40,21 +40,21 @@ class TestBenchmarkResultSchema(TestCase):
             is_default=True,
             sort_order='ASC'
         )
-        self.assertEqual(col.identifier, 'col_1')
-        self.assertEqual(col.name, 'Column 1')
-        self.assertEqual(col.data_type, pd.DT_INTEGER)
-        self.assertFalse(col.required)
-        self.assertEqual(type(col.required), bool)
-        self.assertTrue(col.is_default)
-        self.assertFalse(col.is_desc())
+        assert col.identifier == 'col_1'
+        assert col.name == 'Column 1'
+        assert col.data_type == pd.DT_INTEGER
+        assert not col.required
+        assert type(col.required) == bool
+        assert col.is_default
+        assert not col.is_desc()
         col = schema.BenchmarkResultColumn.from_dict(col.to_dict())
-        self.assertEqual(col.identifier, 'col_1')
-        self.assertEqual(col.name, 'Column 1')
-        self.assertEqual(col.data_type, pd.DT_INTEGER)
-        self.assertFalse(col.required)
-        self.assertEqual(type(col.required), bool)
-        self.assertTrue(col.is_default)
-        self.assertFalse(col.is_desc())
+        assert col.identifier == 'col_1'
+        assert col.name == 'Column 1'
+        assert col.data_type == pd.DT_INTEGER
+        assert not col.required
+        assert type(col.required) == bool
+        assert col.is_default
+        assert not col.is_desc()
 
     def test_schema_serialization(self):
         """Test creating schema objects from dictionaries and vice versa."""
@@ -85,15 +85,15 @@ class TestBenchmarkResultSchema(TestCase):
         s = schema.BenchmarkResultSchema.from_dict(s.to_dict())
         self.validate_schema(s)
         # Error cases
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             doc = s.to_dict()
             doc['unknown'] = 'A'
             schema.BenchmarkResultSchema.from_dict(doc)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             doc = s.to_dict()
             del doc[schema.LABEL_RESULT_FILE]
             schema.BenchmarkResultSchema.from_dict(doc)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             schema.BenchmarkResultColumn(
                 identifier='col_1',
                 name='Column 1',
@@ -102,14 +102,14 @@ class TestBenchmarkResultSchema(TestCase):
 
     def validate_column(self, column, identifier, name, data_type, required):
         """Ensure that the given column matches the respective arguments."""
-        self.assertEqual(column.identifier, identifier)
-        self.assertEqual(column.name, name)
-        self.assertEqual(column.data_type, data_type)
-        self.assertEqual(column.required, required)
+        assert column.identifier == identifier
+        assert column.name == name
+        assert column.data_type == data_type
+        assert column.required == required
 
     def validate_schema(self, schema):
         """Validate that the given schema."""
-        self.assertEqual(len(schema.columns), 3)
+        assert len(schema.columns) == 3
         self.validate_column(
             column=schema.columns[0],
             identifier='col_1',
@@ -131,8 +131,3 @@ class TestBenchmarkResultSchema(TestCase):
             data_type=pd.DT_STRING,
             required=False
         )
-
-
-if __name__ == '__main__':
-    import unittest
-    unittest.main()
