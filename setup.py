@@ -39,7 +39,7 @@ setup(
     author='Heiko Mueller',
     author_email='heiko.muller@gmail.com',
     license='MIT',
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests',)),
     include_package_data=True,
     test_suite='nose.collector',
     extras_require=extras_require,

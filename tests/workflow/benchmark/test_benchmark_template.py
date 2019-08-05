@@ -10,7 +10,7 @@ from benchtmpl.workflow.benchmark.loader import BenchmarkTemplateLoader
 import benchtmpl.error as err
 
 
-DIR = os.path.dirname(os.path.realpath(__file__))
+DIR = os.path.dirname(str(os.path.realpath(__file__)))
 TEMPLATE_FILE_1 = os.path.join(DIR, '../../.files/benchmark/template_1.yaml')
 TEMPLATE_FILE_ERR_1 = os.path.join(DIR, '../../.files/benchmark/template_2.yaml')
 TEMPLATE_FILE_ERR_2 = os.path.join(DIR, '../../.files/benchmark/template_3.yaml')

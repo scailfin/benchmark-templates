@@ -29,9 +29,9 @@ class TestFileCopy(object):
     def test_input_dir_copy(self, tmpdir):
         """Test copying local directories into a workflow run directory."""
         # Copy file to target directory
-        loader = FileCopy(tmpdir)
+        loader = FileCopy(str(tmpdir))
         loader(source=INPUT_DIR, target='workflow')
-        dirname = os.path.join(tmpdir, 'workflow')
+        dirname = os.path.join(str(tmpdir), 'workflow')
         assert os.path.isdir(dirname)
         assert os.path.isdir(os.path.join(dirname, 'code'))
         datadir = os.path.join(dirname, 'data')
@@ -40,7 +40,7 @@ class TestFileCopy(object):
         # Copy to target directory under parent that does not exist
         dst = os.path.join('run', 'files', 'wf')
         loader(source=INPUT_DIR, target=dst)
-        dirname = os.path.join(tmpdir, dst)
+        dirname = os.path.join(str(tmpdir), dst)
         assert os.path.isdir(dirname)
         assert os.path.isdir(os.path.join(dirname, 'code'))
         datadir = os.path.join(dirname, 'data')
@@ -50,24 +50,24 @@ class TestFileCopy(object):
     def test_input_file_copy(self, tmpdir):
         """Test copying local input files into a workflow run directory."""
         # Copy file to target directory
-        loader = FileCopy(tmpdir)
+        loader = FileCopy(str(tmpdir))
         loader(source=INPUT_FILE, target='input.data')
-        assert os.path.isfile(os.path.join(tmpdir, 'input.data'))
+        assert os.path.isfile(os.path.join(str(tmpdir), 'input.data'))
         # Copy file to non-existing target directory
         target = os.path.join('data', 'input.data')
         loader(source=INPUT_FILE, target=target)
-        assert os.path.isfile(os.path.join(tmpdir, target))
+        assert os.path.isfile(os.path.join(str(tmpdir), target))
 
     def test_prepare_inputs_for_local_run(self, tmpdir):
         """Test copying input files for a local workflow run."""
         # Load template
-        store = TemplateRepository(base_dir=tmpdir)
+        store = TemplateRepository(base_dir=str(tmpdir))
         template = store.add_template(
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE
         )
         # Create run directory
-        run_dir = os.path.join(tmpdir, 'run')
+        run_dir = os.path.join(str(tmpdir), 'run')
         os.makedirs(run_dir)
         # Copy input files to run directory
         backend.upload_files(
@@ -126,7 +126,7 @@ class TestFileCopy(object):
                 arguments={
                     'names': TemplateArgument(
                         template.get_parameter('names'),
-                        value=FileHandle(filepath=os.path.join(tmpdir, 'no.file'))
+                        value=FileHandle(filepath=os.path.join(str(tmpdir), 'no.file'))
                     )
                 },
                 loader=FileCopy(run_dir)

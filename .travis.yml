@@ -1,8 +1,7 @@
 sudo: false
-env:
-    - CODECOV_TOKEN="9c6f7c11-0a5f-4950-89a4-793f697c6b97"
 language: python
 python:
+  - "2.7"
   - "3.6"
   - "3.7"
 install: pip install tox-travis

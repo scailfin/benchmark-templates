@@ -31,7 +31,7 @@ class TestTemplateRepository(object):
     """Test functionality of default template repository."""
     def test_add_template(self, tmpdir):
         """Test creating templates."""
-        store = TemplateRepository(base_dir=tmpdir)
+        store = TemplateRepository(base_dir=str(tmpdir))
         template = store.add_template(src_dir=WORKFLOW_DIR)
         self.validate_template_handle(template)
         # Ensure that the template handle has been serialized correctly
@@ -41,7 +41,7 @@ class TestTemplateRepository(object):
         assert os.path.isdir(d)
         # Get template and repeat tests
         self.validate_template_handle(store.get_template(template.identifier))
-        store = TemplateRepository(base_dir=tmpdir)
+        store = TemplateRepository(base_dir=str(tmpdir))
         self.validate_template_handle(store.get_template(template.identifier))
         # Add template with JSON specification file
         template = store.add_template(
@@ -68,7 +68,7 @@ class TestTemplateRepository(object):
         """Ensure correct return values when deleting existing and non-existing
         templates.
         """
-        store = TemplateRepository(base_dir=tmpdir)
+        store = TemplateRepository(base_dir=str(tmpdir))
         template = store.add_template(src_dir=WORKFLOW_DIR)
         f = os.path.join(store.base_dir, template.identifier, TEMPLATE_FILE)
         d = os.path.join(store.base_dir, template.identifier, STATIC_FILES_DIR)
@@ -80,14 +80,14 @@ class TestTemplateRepository(object):
         assert not store.delete_template(template.identifier)
         # Test deleting after store object is re-instantiated
         template = store.add_template(src_dir=WORKFLOW_DIR)
-        store = TemplateRepository(base_dir=tmpdir)
+        store = TemplateRepository(base_dir=str(tmpdir))
         assert store.delete_template(template.identifier)
         assert not store.delete_template(template.identifier)
 
     def test_error_for_id_func(self, tmpdir):
         """Error when the id function cannot return unique folder identifier."""
         dummy_func = DummyIDFunc()
-        store = TemplateRepository(base_dir=os.path.join(tmpdir), id_func=dummy_func)
+        store = TemplateRepository(base_dir=os.path.join(str(tmpdir)), id_func=dummy_func)
         os.makedirs(os.path.join(store.base_dir, dummy_func()))
         with pytest.raises(RuntimeError):
             store.add_template(src_dir=WORKFLOW_DIR)
