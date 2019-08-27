@@ -1,14 +1,47 @@
 """Test validation of template parameter declarations."""
 
 import pytest
+import yaml
 
 from benchtmpl.workflow.parameter.base import TemplateParameter
 
 import benchtmpl.error as err
 import benchtmpl.workflow.parameter.declaration as pd
+import benchtmpl.workflow.parameter.util as putil
 
 
 class TestParameterValidation(object):
+    def test_example_declarations(self):
+        """Ensure that the parameter declarations in the documentation example
+        are valid.
+        """
+        EXAMPLE ="""parameters:
+            - id: outputFormat
+              name: Output file format
+              description: Format of the generated output file (JSON or YAML files are currently supported)
+              datatype: int
+              values:
+                - name: JSON
+                  value: 0
+                  isDefault: true
+                - name: YAML
+                  value: 1
+              index: 0
+            - id: threshold
+              name: Threshold
+              description: Threshold that is relevant for a parameterized workflow step
+              datatype: decimal
+              defaultValue: 4.2
+              index: 1
+        """
+        parameters = putil.create_parameter_index(
+            yaml.load(EXAMPLE, Loader=yaml.Loader)['parameters'],
+            validate=True
+        )
+        assert len(parameters) == 2
+        assert parameters['outputFormat'].is_int()
+        assert parameters['threshold'].is_float()
+
     def test_invalid_datatype(self):
         """Assert that an error is raised if a package declaration with an
         invalid data type is given.

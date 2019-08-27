@@ -195,8 +195,7 @@ def parameter_declaration(
         para[LABEL_PARENT] = parent
     if not as_const is None:
         para[LABEL_AS] = as_const
-    # Ignore given default values for file parameters
-    if not default_value is None and data_type != DT_FILE:
+    if not default_value is None:
         para[LABEL_DEFAULT] = default_value
     return para
 

@@ -3,7 +3,7 @@ Benchmark Templates
 ===================
 
 
-**Benchmark Templates** are an extension of `parameterized workflow templates <https://github.com/scailfin/benchmark-templates/blob/master/docs/workflow.rst>`_ for the *Reproducible Open Benchmarks for Data Analysis Platform (ROB)*. Benchmark templates extend the base templates with information about the schema of the benchmark results. The idea is that benchmark workflows contain steps towards the end that evaluate the results of a benchmark run. These evaluation results are stored in a simple JSON or YAML file. Result files are processed by the `Reproducible Benchmark Engine <https://github.com/scailfin/benchmark-engine>` to create the benchmark leaderboard.
+**Benchmark Templates** are an extension of `parameterized workflow templates <https://github.com/scailfin/benchmark-templates/blob/master/docs/workflow.rst>`_ for the *Reproducible Open Benchmarks for Data Analysis Platform (ROB)*. Benchmark templates extend the base templates with information about the schema of the benchmark results. The idea is that benchmark workflows contain steps towards the end that evaluate the results of a benchmark run. These evaluation results are stored in a simple JSON or YAML file. Result files are processed by the `Reproducible Benchmark Engine <https://github.com/scailfin/benchmark-engine>`_ to create the benchmark leaderboard.
 
 
 Benchmark Template Specification

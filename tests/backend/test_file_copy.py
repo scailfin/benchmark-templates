@@ -4,14 +4,14 @@ import os
 import pytest
 import shutil
 
-from benchtmpl.backend.files import FileCopy
+from benchtmpl.io.backend import FileCopy
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.value import TemplateArgument
 from benchtmpl.workflow.template.base import TemplateHandle
 from benchtmpl.workflow.template.repo import TemplateRepository
 
 import benchtmpl.error as err
-import benchtmpl.backend.files as backend
+import benchtmpl.io.backend as backend
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

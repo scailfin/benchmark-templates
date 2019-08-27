@@ -16,6 +16,12 @@ from benchtmpl.error import InvalidParameterError
 import benchtmpl.workflow.parameter.declaration as pd
 
 
+"""Special value for as-property that indicates user input for target path of
+uploaded files.
+"""
+AS_INPUT = '$input'
+
+
 class ParameterBase(object):
     """Base class for template parameter and parameter argument values. The
     base class maintains the unique parameter identifier and the information
@@ -146,6 +152,13 @@ class TemplateParameter(ParameterBase):
         """
         self.children.append(para)
         self.children.sort(key=lambda p: (p.index, p.identifier))
+
+    def as_input(self):
+        """Flag indicating whether the value for the as constant property is
+        the special value that indicates that the property value is provided
+        by the user.
+        """
+        return self.as_constant == AS_INPUT
 
     def get_constant(self):
         """Get the value of the as_constant property.

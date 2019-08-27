@@ -30,7 +30,7 @@ extras_require = {
 
 setup(
     name='benchmark-templates',
-    version='0.1.2',
+    version='0.2.0',
     description='Workflow Templates for Reproducible Data Analysis Benchmarks',
     long_description=readme,
     long_description_content_type='text/x-rst',
@@ -54,5 +54,5 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python'
-    ],
+    ]
 )

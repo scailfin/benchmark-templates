@@ -1,5 +1,13 @@
-"""Utilities for workflow templates. Provides methods and classes to copy
-and upload files for workflow runs.
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
+"""Utilities for workflow template backends. Provides methods and classes to
+copy and upload files for workflow runs.
 """
 
 import errno
@@ -8,7 +16,6 @@ import shutil
 
 import benchtmpl.error as err
 import benchtmpl.workflow.template.base as tmpl
-
 
 
 # ------------------------------------------------------------------------------
@@ -120,7 +127,12 @@ def upload_files(template, files, arguments, loader):
                 # Get path to source file from file handle
                 source = arg.value.filepath
             if para.has_constant():
-                target = para.get_constant()
+                if para.as_input():
+                    # If the as_input flag is True it is assumed that the user
+                    # provided a target path for the file during upload
+                    target = arg.value.target_path
+                else:
+                    target = para.get_constant()
             else:
                 target = arg.value.name
         else:

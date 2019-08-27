@@ -73,3 +73,24 @@ class FileHandle(object):
         int
         """
         return os.stat(self.filepath).st_size
+
+
+class InputFile(FileHandle):
+    """The InputFile represents the value for a template parameter of type
+    'file'. This class extends the handle for an uploaded file with an optional
+    target path that the user may have provided.
+    """
+    def __init__(self, f_handle, target_path=None):
+        """Initialize the object properties.
+
+        Parameters
+        ----------
+        f_handle: benchtmpl.io.files.base.FileHandle
+        target_path: string, optional
+        """
+        super(InputFile, self).__init__(
+            filepath=f_handle.filepath,
+            identifier=f_handle.identifier,
+            file_name=f_handle.file_name
+        )
+        self.target_path = target_path

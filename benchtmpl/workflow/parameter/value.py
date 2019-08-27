@@ -11,7 +11,7 @@ workflow template parameters. The class is a simple wrapper that combines
 the value and the meta-data in the parameter declaration.
 """
 
-from benchtmpl.io.files.base import FileHandle
+from benchtmpl.io.files.base import InputFile
 from benchtmpl.workflow.parameter.base import ParameterBase
 
 import benchtmpl.workflow.parameter.declaration as pd
@@ -34,7 +34,7 @@ class TemplateArgument(ParameterBase):
         ----------
         parameter: benchtmpl.workflow.parameter.base.TemplateParameter
             Parameter declaration
-        value: list or dict or scalar or benchtmpl.io.files.base.FileHandle
+        value: list or dict or scalar or benchtmpl.workflow.parameter.value.InputFile
             Parameter value. the type depends on the parameter data type.
         validate: bool, optional
             Validate the argument value against the parameter declaration if
@@ -116,8 +116,8 @@ class TemplateArgument(ParameterBase):
                 raise ValueError('expected string for \'{}\''.format(self.identifier))
         elif self.is_file():
             # Expects a file handle
-            if not isinstance(self.value, FileHandle):
-                raise ValueError('expected file handle for \'{}\''.format(self.identifier))
+            if not isinstance(self.value, InputFile):
+                raise ValueError('expected input file for \'{}\''.format(self.identifier))
         elif self.is_list():
             if not isinstance(self.value, list):
                 raise ValueError('expected list for \'{}\''.format(self.identifier))

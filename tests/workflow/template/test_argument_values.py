@@ -3,7 +3,7 @@
 import os
 import pytest
 
-from benchtmpl.io.files.base import FileHandle
+from benchtmpl.io.files.base import FileHandle, InputFile
 from benchtmpl.workflow.parameter.base import TemplateParameter
 from benchtmpl.workflow.template.base import TemplateHandle
 from benchtmpl.workflow.template.loader import DefaultTemplateLoader
@@ -35,7 +35,7 @@ class TestArgumentValues(object):
             ]
         )
         params = template.parameters
-        fh = FileHandle(filepath=LOCAL_FILE)
+        fh = InputFile(f_handle=FileHandle(filepath=LOCAL_FILE))
         # Valid argument set
         args = values.parse_arguments(
             arguments={'A': 10, 'B': True, 'C': 12.5, 'D': fh, 'E': 'ABC'},

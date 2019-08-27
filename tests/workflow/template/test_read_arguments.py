@@ -3,7 +3,7 @@
 import pytest
 
 from benchtmpl.io.scanner import Scanner, ListReader
-from benchtmpl.workflow.parameter.base import TemplateParameter
+from benchtmpl.workflow.parameter.base import TemplateParameter, AS_INPUT
 from benchtmpl.workflow.template.base import TemplateHandle
 
 import benchtmpl.workflow.parameter.declaration as pd
@@ -23,6 +23,23 @@ class TestReadTemplateArguments(object):
                         identifier='codeFile',
                         data_type=pd.DT_FILE,
                         index=0,
+                        default_value=None,
+                        as_const=AS_INPUT
+                    )
+                ),
+                TemplateParameter(
+                    pd.parameter_declaration(
+                        identifier='dataFile',
+                        data_type=pd.DT_FILE,
+                        index=1,
+                        default_value='data/names.txt'
+                    )
+                ),
+                TemplateParameter(
+                    pd.parameter_declaration(
+                        identifier='resultFile',
+                        data_type=pd.DT_FILE,
+                        index=2,
                         default_value=None
                     )
                 ),
@@ -30,7 +47,7 @@ class TestReadTemplateArguments(object):
                     pd.parameter_declaration(
                         identifier='sleeptime',
                         data_type=pd.DT_INTEGER,
-                        index=1,
+                        index=3,
                         default_value=10
                     )
                 ),
@@ -38,7 +55,7 @@ class TestReadTemplateArguments(object):
                     pd.parameter_declaration(
                         identifier='verbose',
                         data_type=pd.DT_BOOL,
-                        index=2,
+                        index=4,
                         default_value=False
                     )
                 ),
@@ -46,20 +63,34 @@ class TestReadTemplateArguments(object):
                     pd.parameter_declaration(
                         identifier='frac',
                         data_type=pd.DT_DECIMAL,
-                        index=4
+                        index=6
                     )
                 ),
                 TemplateParameter(
                     pd.parameter_declaration(
                         identifier='outputType',
-                        index=3
+                        index=5
                     )
                 ),
             ]
         )
-        sc = Scanner(reader=ListReader(['ABC.txt', 3, True, 'XYZ', 0.123]))
+        sc = Scanner(reader=ListReader([
+            'ABC.txt',
+            'code/abc.py',
+            '',
+            'result/output.txt',
+            3,
+            True,
+            'XYZ',
+            0.123
+        ]))
         arguments = tmpl.read(template.list_parameters(), scanner=sc)
         assert arguments['codeFile'].name == 'ABC.txt'
+        assert arguments['codeFile'].target_path == 'code/abc.py'
+        assert arguments['dataFile'].name == 'names.txt'
+        assert arguments['dataFile'].target_path is None
+        assert arguments['resultFile'].name == 'output.txt'
+        assert arguments['resultFile'].target_path is None
         assert arguments['sleeptime'] == 3
         assert arguments['verbose']
         assert arguments['outputType'] == 'XYZ'

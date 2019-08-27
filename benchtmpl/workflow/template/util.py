@@ -13,7 +13,7 @@ of the reproducible benchmark engine.
 
 from __future__ import print_function
 
-from benchtmpl.io.files.base import FileHandle
+from benchtmpl.io.files.base import FileHandle, InputFile
 from benchtmpl.io.scanner import Scanner
 
 
@@ -72,7 +72,7 @@ def read_parameter(para, scanner, prompt_prefix=''):
 
     Returns
     -------
-    bool or float or int or string or list
+    bool or float or int or string or benchtmpl.io.files.base.InputFile
     """
     done = False
     while not done:
@@ -83,7 +83,14 @@ def read_parameter(para, scanner, prompt_prefix=''):
                 return scanner.next_bool(default_value=para.default_value)
             elif para.is_file():
                 filename = scanner.next_file(default_value=para.default_value)
-                return FileHandle(filepath=filename)
+                target_path = None
+                if para.has_constant() and para.as_input():
+                    print('Target Path:', end='')
+                    target_path = scanner.next_string()
+                return InputFile(
+                    f_handle=FileHandle(filepath=filename),
+                    target_path=target_path
+                )
             elif para.is_float():
                 return scanner.next_float(default_value=para.default_value)
             elif para.is_int():

@@ -14,3 +14,9 @@
 
 * Add (de-)serializer methods for workflow state classes
 * Change behavior of resource descriptor serialization
+
+
+### 0.2.0 - 2019-08-27
+
+* Split package benchtmpl.backend
+* Allow users to specify target path for uploaded files
