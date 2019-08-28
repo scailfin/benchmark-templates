@@ -21,9 +21,6 @@ the modified workflow specification in which references to template parameters
 have been replaced by parameter values.
 """
 
-from benchtmpl.workflow.parameter.base import TemplateParameter
-from benchtmpl.workflow.parameter.value import TemplateArgument
-
 import benchtmpl.error as err
 import benchtmpl.util.core as util
 import benchtmpl.workflow.parameter.util as para
@@ -72,30 +69,6 @@ class TemplateHandle(object):
                 if para.identifier in self.parameters:
                     raise err.InvalidTemplateError('parameter \'{}\' not unique'.format(para.identifier))
                 self.parameters[para.identifier] = para
-
-    def get_argument(self, identifier, value, validate=False):
-        """Get instance of the template argument class for the given parameter
-        and the given value.
-
-        Parameters
-        ----------
-        identifier: string
-            Unique parameter declaration identifier
-        value: any
-            Argument value for the parameter
-        validate: bool, optional
-            Validate the argument value against the parameter declaration if
-            set to True
-
-        Returns
-        -------
-        benchtmpl.workflow.parameter.value import TemplateArgument
-        """
-        return TemplateArgument(
-            parameter=self.get_parameter(identifier),
-            value=value,
-            validate=validate
-        )
 
     def get_parameter(self, identifier):
         """Short-cut to access the declaration for a parameter with the given
@@ -312,7 +285,7 @@ def replace_value(value, arguments, parameters):
         if var in arguments:
             arg = arguments[var]
             if para.is_file():
-                return arg.value.name
+                return arg.value.target()
             else:
                 return arg.value
         # Return the parameter default value

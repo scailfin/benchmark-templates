@@ -11,7 +11,7 @@ workflow template parameters. The class is a simple wrapper that combines
 the value and the meta-data in the parameter declaration.
 """
 
-from benchtmpl.io.files.base import InputFile
+from benchtmpl.io.files.base import FileHandle, InputFile
 from benchtmpl.workflow.parameter.base import ParameterBase
 
 import benchtmpl.workflow.parameter.declaration as pd
@@ -23,7 +23,7 @@ class TemplateArgument(ParameterBase):
     specification. The argument class captures the actual value and provides
     access to the parameter meta-data.
     """
-    def __init__(self, parameter, value, validate=False):
+    def __init__(self, parameter, value, validate=True):
         """Initialize the parameter value and meta-data. The type of the value
         argument depends on the data type of the parameter. If the parameter is
         of type record the value is expected to be a dictionary of arguments.
@@ -48,50 +48,26 @@ class TemplateArgument(ParameterBase):
             identifier=parameter.identifier,
             data_type=parameter.data_type
         )
-        self.parameter = parameter
-        self.value = value
+        # Modify the given argument value if it is of type FileHandle
+        if parameter.is_file() and isinstance(value, FileHandle):
+            if parameter.has_constant():
+                if parameter.as_input():
+                    raise ValueError(
+                        'expected input file for \'{}\''.format(self.identifier)
+                    )
+                else:
+                    target_path = parameter.get_constant()
+            else:
+                target_path = value.name
+            self.value = InputFile(
+                f_handle=value,
+                target_path=target_path
+            )
+        else:
+            self.value = value
         # Validate the argument value if the validate flag is set to True
         if validate:
             self.validate()
-
-    def get(self, key):
-        """Shortcut to get element for parameters of type record or list.
-
-        Parameters
-        ----------
-        key: string or int
-            Depending on the parameter type the key is either a list index or
-            a dictionary key
-
-        Returns
-        -------
-        benchtmpl.workflow.parameter.value.TemplateArgument
-        """
-        return self.value[key]
-
-    def has(self, key):
-        """Test if the argument value for a record parameter contains a value
-        for the given record element.
-
-        Parameters
-        ----------
-        key: string
-            Unique identifier for child element in a parameter record
-
-        Returns
-        -------
-        bool
-        """
-        return key in self.value
-
-    def len(self):
-        """Shortcut to get length of list if parameter is of type list.
-
-        Returns
-        -------
-        int
-        """
-        return len(self.value)
 
     def validate(self):
         """Validate the argument value against the parameter declaration. This

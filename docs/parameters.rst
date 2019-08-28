@@ -53,7 +53,7 @@ The following example declares two input parameters for a workflow template. Wit
           datatype: decimal
           defaultValue: 4.2
           index: 1
-          
+
 
 The first parameter ``outputFormat`` defines a list of possible values. For each value the ``name`` defines the displayed name while ``value`` defines the resulting value if the respective entry is selected. Only one of the values in the list can be declared as the default value. An input form would render the output format parameter before the threshold parameter.
 
@@ -64,7 +64,7 @@ See the `Benchmark Templates <https://github.com/scailfin/benchmark-templates/bl
 File Parameters
 ===============
 
-Template parameters of type ``file`` are intended to allow users to upload files from their local computer to the server that executes a workflow template. File parameter specifications may include the ``as`` property to specify the target path of the uploaded file. Consider the example below. in this example, the file that the user uploads will available at the path ``data/names.txt`` in the workfow environment when the workflow is executed.
+Template parameters of type ``file`` are intended to allow users to upload files from their local computer to the server that executes a workflow template. File parameter specifications may include the ``as`` property to specify the target path of the uploaded file. Consider the example below. in this example, the file that the user uploads will available at the path ``data/names.txt`` in the environment where the workflow is executed.
 
 .. code-block:: yaml
 
@@ -72,8 +72,11 @@ Template parameters of type ``file`` are intended to allow users to upload files
         - id: names
           name: 'Input file'
           datatype: file
-          as: data/names.txt
+          defaultValue: 'input/names.txt'
+          as: 'data/names.txt'
 
+
+ If the ``as`` property is not set, the ``defaultValue`` will be used as the target path. Note that the ``defaultValue`` will be the source path for the file if no argument value for the parameter ``names`` is given. That is, the file at path ``input/names.txt`` will be used as input if the user does not upload a file for ``names``. The target path will be ``data/names.txt``.
 
 The ``as`` property may take the special value ``$input``. In this case, the target path is not predefined but provided by the user it as part of the input. The use of ``$input`` is intended to allow flexibility around the type of environment (i.e., Docker image) the user-provided code runs in. Consider the following modification of the *Hello World* example where the user can provide their own implementation of the code that generates the greetings:
 
@@ -180,4 +183,3 @@ The JSON schema for template parameters is shown below:
     required:
     - id
     type: object
-    

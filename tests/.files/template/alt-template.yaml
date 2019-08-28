@@ -3,6 +3,7 @@ workflow:
     inputs:
       files:
         - code/helloworld.py
+        - $[[script]]
         - $[[names]]
         - $[[friends]]
       parameters:
@@ -28,6 +29,10 @@ parameters:
     - id: code
       name: 'Code file'
       datatype: file
+    - id: script
+      name: 'Command Script'
+      datatype: file
+      defaultValue: code/script.sh
     - id: names
       name: 'Input file'
       datatype: file

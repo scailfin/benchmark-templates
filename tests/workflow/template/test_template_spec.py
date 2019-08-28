@@ -5,6 +5,7 @@ import pytest
 
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.base import TemplateParameter
+from benchtmpl.workflow.parameter.value import TemplateArgument
 from benchtmpl.workflow.resource.base import ResourceDescriptor, LABEL_ID
 from benchtmpl.workflow.template.base import TemplateHandle
 from benchtmpl.workflow.template.loader import DefaultTemplateLoader
@@ -173,16 +174,16 @@ class TestTemplateHandle(object):
         for filename in [TEMPLATE_YAML_FILE, TEMPLATE_JSON_FILE]:
             template = DefaultTemplateLoader().load(filename)
             arguments = {
-                'code': template.get_argument(
-                    identifier='code',
+                'code': TemplateArgument(
+                    parameter=template.get_parameter('code'),
                     value=FileHandle('code/helloworld.py')
                 ),
-                'names': template.get_argument(
-                    identifier='names',
+                'names': TemplateArgument(
+                    parameter=template.get_parameter('names'),
                     value=FileHandle('data/list-of-names.txt')
                 ),
-                'sleeptime': template.get_argument(
-                    identifier='sleeptime',
+                'sleeptime': TemplateArgument(
+                    parameter=template.get_parameter('sleeptime'),
                     value=10
                 )
             }

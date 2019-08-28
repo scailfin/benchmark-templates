@@ -16,7 +16,6 @@
 * Change behavior of resource descriptor serialization
 
 
-### 0.2.0 - 2019-08-27
+### 0.2.0 - 2019-08-28
 
-* Split package benchtmpl.backend
 * Allow users to specify target path for uploaded files

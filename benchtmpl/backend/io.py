@@ -14,6 +14,9 @@ import errno
 import os
 import shutil
 
+from benchtmpl.io.files.base import FileHandle, InputFile
+from benchtmpl.workflow.parameter.value import TemplateArgument
+
 import benchtmpl.error as err
 import benchtmpl.workflow.template.base as tmpl
 
@@ -116,25 +119,29 @@ def upload_files(template, files, arguments, loader):
                 if para.default_value is None:
                     raise err.MissingArgumentError(var)
                 else:
-                    # Set source path to default value (assuming that
-                    # the default points to a file in the template
-                    # base directory)
-                    source = os.path.join(
-                        template.base_dir,
-                        para.default_value
+                    # Set argument to file handle using the default value
+                    # (assuming that the default points to a file in the
+                    # template base directory).
+                    if para.has_constant() and not para.as_input():
+                        target_path = para.get_constant()
+                    else:
+                        target_path = para.default_value
+                    arg = TemplateArgument(
+                        parameter=para,
+                        value=InputFile(
+                            f_handle=FileHandle(
+                                filepath=os.path.join(
+                                    template.base_dir,
+                                    para.default_value
+                                )
+                            ),
+                            target_path=target_path
+                        )
                     )
-            else:
-                # Get path to source file from file handle
-                source = arg.value.filepath
-            if para.has_constant():
-                if para.as_input():
-                    # If the as_input flag is True it is assumed that the user
-                    # provided a target path for the file during upload
-                    target = arg.value.target_path
-                else:
-                    target = para.get_constant()
-            else:
-                target = arg.value.name
+            # Get path to source file and the target path from the input
+            # file handle
+            source = arg.value.source()
+            target = arg.value.target()
         else:
             source = os.path.join(template.base_dir, val)
             target = val

@@ -107,10 +107,10 @@ class TestArgumentValues(object):
             validate=True
         )
         assert len(args) == 2
-        assert args['B'].has('C')
-        assert not args['B'].has('D')
-        assert args['B'].len() == 1
-        assert args['B'].get('C').value == 12.3
+        assert not args['B'].value.get('C') is None
+        assert args['B'].value.get('D') is None
+        assert len(args['B'].value) == 1
+        assert args['B'].value.get('C').value == 12.3
         # With list arguments
         args = values.parse_arguments(
             arguments={
@@ -126,10 +126,10 @@ class TestArgumentValues(object):
             validate=True
         )
         assert len(args) == 3
-        assert args['B'].has('C')
-        assert args['B'].has('D')
-        assert args['B'].len() == 2
-        assert args['E'].len() == 3
+        assert not args['B'].value.get('C') is None
+        assert not args['B'].value.get('D') is None
+        assert len(args['B'].value) == 2
+        assert len(args['E'].value) == 3
         for arg in args['E'].value:
             if arg.get('F').value < 3:
                 assert len(arg) == 1
@@ -146,13 +146,11 @@ class TestArgumentValues(object):
     def test_validate(self):
         """Test error cases for argument validation."""
         para_list = TemplateParameter(pd.parameter_declaration('E', data_type=pd.DT_LIST))
-        values.TemplateArgument(parameter=para_list, value=1)
         with pytest.raises(ValueError):
-            values.TemplateArgument(parameter=para_list, value=1, validate=True)
+            values.TemplateArgument(parameter=para_list, value=1)
         para_record = TemplateParameter(pd.parameter_declaration('E', data_type=pd.DT_RECORD))
-        values.TemplateArgument(parameter=para_record, value=list())
         with pytest.raises(ValueError):
-            values.TemplateArgument(parameter=para_record, value=list(), validate=True)
+            values.TemplateArgument(parameter=para_record, value=list())
         arg = values.TemplateArgument(
             parameter=TemplateParameter(pd.parameter_declaration('E', data_type=pd.DT_INTEGER)),
             value=1,

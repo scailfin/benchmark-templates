@@ -4,20 +4,21 @@ import os
 import pytest
 import shutil
 
-from benchtmpl.io.backend import FileCopy
+from benchtmpl.backend.io import FileCopy
 from benchtmpl.io.files.base import FileHandle
 from benchtmpl.workflow.parameter.value import TemplateArgument
 from benchtmpl.workflow.template.base import TemplateHandle
 from benchtmpl.workflow.template.repo import TemplateRepository
 
 import benchtmpl.error as err
-import benchtmpl.io.backend as backend
+import benchtmpl.backend.io as backend
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_FILE = os.path.join(DIR, '../.files/workflows/helloworld/data/names.txt')
 INPUT_DIR = os.path.join(DIR, '../.files/workflows/helloworld')
 INPUT_FILE = os.path.join(DIR, '../.files/schema.json')
+SCRIPT_FILE = os.path.join(DIR, '../.files/workflows/helloworld/code/script.txt')
 WORKFLOW_DIR = os.path.join(DIR, '../.files/template')
 
 SPEC_FILE = os.path.join(WORKFLOW_DIR, 'alt-template.yaml')
@@ -86,8 +87,10 @@ class TestFileCopy(object):
         # data/persons.txt
         # data/friends.txt
         assert os.path.isfile(os.path.join(run_dir, 'code', 'helloworld.py'))
+        assert os.path.isfile(os.path.join(run_dir, 'code', 'script.sh'))
         assert os.path.isfile(os.path.join(run_dir, 'data', 'persons.txt'))
         assert os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt'))
+        assert not os.path.isfile(os.path.join(run_dir, 'code', 'dontcopy.me'))
         # data/persons.txt should contain Alice and Bob
         names = set()
         with open(os.path.join(run_dir, 'data', 'persons.txt'), 'r') as f:
