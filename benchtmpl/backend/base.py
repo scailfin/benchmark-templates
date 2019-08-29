@@ -53,7 +53,7 @@ class WorkflowEngine(object):
 
         Returns
         -------
-        string
+        string, benchtmpl.workflow.state.WorkflowState
         """
         raise NotImplementedError()
 
@@ -73,5 +73,20 @@ class WorkflowEngine(object):
         Raises
         ------
         benchtmpl.error.UnknownRunError
+        """
+        raise NotImplementedError()
+
+    def remove_run(self, run_id):
+        """Clear internal resources for for the given run. Raises error if the
+        run is still active.
+
+        Parameters
+        ----------
+        run_id: string
+            Unique run identifier
+
+        Raises
+        ------
+        RuntimeError
         """
         raise NotImplementedError()
