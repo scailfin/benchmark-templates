@@ -7,6 +7,7 @@ install_requires=[
     'future',
     'gitpython',
     'jsonschema',
+    'psycopg2-binary',
     'pyyaml>=5.1'
 ]
 

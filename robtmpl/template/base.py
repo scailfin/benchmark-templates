@@ -21,7 +21,7 @@ the modified workflow specification in which references to template parameters
 have been replaced by parameter values.
 """
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 import robtmpl.core.util as util
 
 
@@ -52,7 +52,7 @@ class TemplateHandle(object):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
+        robtmpl.core.error.InvalidTemplateError
         """
         self.workflow_spec = workflow_spec
         if not identifier is None:
@@ -110,7 +110,7 @@ class TemplateHandle(object):
             Dictionary of argument values for parameters in the template
 
         Raises
-        ------robtmpl.error.MissingArgumentError
+        ------robtmpl.core.error.MissingArgumentError
         """
         for para in self.parameters.values():
             if para.is_required and para.default_value is None:
@@ -153,7 +153,7 @@ def get_parameter_references(spec, parameters=None):
 
     Raises
     ------
-    robtmpl.error.InvalidTemplateError
+    robtmpl.core.error.InvalidTemplateError
     """
     # The new object will contain the modified workflow specification
     if parameters is None:
@@ -226,7 +226,7 @@ def replace_args(spec, arguments, parameters):
 
     Raises
     ------
-    robtmpl.error.InvalidTemplateError
+    robtmpl.core.error.InvalidTemplateError
     """
     if isinstance(spec, dict):
         # The new object will contain the modified workflow specification

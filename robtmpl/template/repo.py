@@ -20,7 +20,7 @@ import shutil
 from robtmpl.template.base import TemplateHandle
 from robtmpl.template.loader import DefaultTemplateLoader
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 import robtmpl.core.util as util
 
 
@@ -115,8 +115,8 @@ class TemplateRepository(object):
 
         Raises
         ------
-        robtmpl.error.InvalidParameterError
-        robtmpl.error.InvalidTemplateError
+        robtmpl.core.error.InvalidParameterError
+        robtmpl.core.error.InvalidTemplateError
         ValueError
         """
         # Exactly one of src_dir and src_repo_url has to be not None. If both
@@ -173,7 +173,7 @@ class TemplateRepository(object):
                         filename=os.path.join(template_dir, TEMPLATE_FILE)
                     )
                     return template
-        except (IOError, OSError, ValueError, err.TemplateError) as ex:
+        except (IOError, OSError, ValueError, err.ROBError) as ex:
             # Make sure to cleanup by removing the created template folder
             shutil.rmtree(template_dir)
             raise err.InvalidTemplateError(str(ex))
@@ -223,8 +223,8 @@ class TemplateRepository(object):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
-        robtmpl.error.UnknownTemplateError
+        robtmpl.core.error.InvalidTemplateError
+        robtmpl.core.error.UnknownTemplateError
         """
         # Raise exception if the template directory does not exist
         template_dir = os.path.join(self.base_dir, identifier)

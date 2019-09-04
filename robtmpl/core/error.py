@@ -6,12 +6,12 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
-"""Exceptions that are raised by the various components of the benchmark
-templates.
+"""Exceptions that are raised by the various components of the reproducible
+open benchmark components.
 """
 
 
-class TemplateError(Exception):
+class ROBError(Exception):
     """Base exception indicating that a component of benchmark templates
     encountered an error situation.
     """
@@ -35,28 +35,27 @@ class TemplateError(Exception):
         """
         return self.message
 
-# ------------------------------------------------------------------------------
-# Backend
-# ------------------------------------------------------------------------------
+# -- Configuration -------------------------------------------------------------
 
-class MissingArgumentError(TemplateError):
-    """Exception indicating that a required parameter in a workflow template
-    has no argument given for a workflow run.
+class MissingConfigurationError(ROBError):
+    """Error indicating that the value for an environment variable is not set.
     """
-    def __init__(self, identifier):
-        """Initialize missing argument error message for parameter identifier.
+    def __init__(self, var_name):
+        """Initialize error message.
 
         Parameters
         ----------
-        identifier: string
-            Unique parameter identifier
+        var_name: string
+            Environment variable name
         """
-        super(MissingArgumentError, self).__init__(
-            message='missing argument for \'{}\''.format(identifier)
+        super(MissingConfigurationError, self).__init__(
+            message='variable \'{}\' not set'.format(var_name)
         )
 
 
-class UnknownRunError(TemplateError):
+# --  Workflow Engine ----------------------------------------------------------
+
+class UnknownRunError(ROBError):
     """Exception indicating that a given run identifier does not reference a
     known workflow run.
     """
@@ -73,11 +72,9 @@ class UnknownRunError(TemplateError):
         )
 
 
-# ------------------------------------------------------------------------------
-# Workflow Templates
-# ------------------------------------------------------------------------------
+# -- Workflow Templates --------------------------------------------------------
 
-class InvalidParameterError(TemplateError):
+class InvalidParameterError(ROBError):
     """Exception indicating that a given template parameter is invalid.
     """
     def __init__(self, message):
@@ -92,7 +89,7 @@ class InvalidParameterError(TemplateError):
         super(InvalidParameterError, self).__init__(message=message)
 
 
-class InvalidTemplateError(TemplateError):
+class InvalidTemplateError(ROBError):
     """Exception indicating that a given workflow template is invalid or has
     missing elements.
     """
@@ -107,7 +104,25 @@ class InvalidTemplateError(TemplateError):
         """
         super(InvalidTemplateError, self).__init__(message=message)
 
-class UnknownParameterError(TemplateError):
+
+class MissingArgumentError(ROBError):
+    """Exception indicating that a required parameter in a workflow template
+    has no argument given for a workflow run.
+    """
+    def __init__(self, identifier):
+        """Initialize missing argument error message for parameter identifier.
+
+        Parameters
+        ----------
+        identifier: string
+            Unique parameter identifier
+        """
+        super(MissingArgumentError, self).__init__(
+            message='missing argument for \'{}\''.format(identifier)
+        )
+
+
+class UnknownParameterError(ROBError):
     """Exception indicating that a workflow specification references a parameter
     that is not defined for a given template.
     """
@@ -124,7 +139,7 @@ class UnknownParameterError(TemplateError):
         )
 
 
-class UnknownTemplateError(TemplateError):
+class UnknownTemplateError(ROBError):
     """Exception indicating that a given template identifier does not reference
     an existing template.
     """

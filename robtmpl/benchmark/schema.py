@@ -86,7 +86,7 @@ class BenchmarkResultColumn(object):
 
         Returns
         -------
-        robtmpl.template.benchmark.schema.BenchmarkResultColumn
+        robtmpl.benchmark.schema.BenchmarkResultColumn
 
         Raises
         ------
@@ -178,7 +178,7 @@ class BenchmarkResultSchema(object):
 
         Parameters
         ----------
-        columns: list(robtmpl.template.benchmark.schema.BenchmarkResultColumn)
+        columns: list(robtmpl.benchmark.schema.BenchmarkResultColumn)
             List of columns in the result object
         result_file_id: string
             Identifier of the benchmark run result file that contains the
@@ -201,7 +201,7 @@ class BenchmarkResultSchema(object):
 
         Returns
         -------
-        robtmpl.template.benchmark.schema.BenchmarkResultSchema
+        robtmpl.benchmark.schema.BenchmarkResultSchema
 
         Raises
         ------

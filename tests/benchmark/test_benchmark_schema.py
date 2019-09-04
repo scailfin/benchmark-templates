@@ -1,8 +1,16 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Test benchmark result schema objects."""
 
 import pytest
 
-import robtmpl.template.benchmark.schema as schema
+import robtmpl.benchmark.schema as schema
 
 import robtmpl.template.parameter.declaration as pd
 

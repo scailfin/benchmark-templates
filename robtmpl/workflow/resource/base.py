@@ -21,7 +21,7 @@ In the future we might want to maintain additional information about the files
 resources.
 """
 
-from robtmpl.error import InvalidTemplateError
+from robtmpl.core.error import InvalidTemplateError
 
 
 """Identifier for resource types."""
@@ -75,7 +75,7 @@ class ResourceDescriptor(object):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
+        robtmpl.core.error.InvalidTemplateError
         """
         if not (LABEL_ID in doc and LABEL_TYPE in doc):
             raise InvalidTemplateError('invalid resource descriptor serialization')

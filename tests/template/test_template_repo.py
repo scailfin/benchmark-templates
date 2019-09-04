@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Test functionality of the default template repository implementation."""
 
 import os
@@ -8,7 +16,7 @@ from robtmpl.template.loader import DefaultTemplateLoader
 from robtmpl.template.repo import TemplateRepository
 from robtmpl.template.repo import STATIC_FILES_DIR, TEMPLATE_FILE
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

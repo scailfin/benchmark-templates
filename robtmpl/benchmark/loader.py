@@ -11,11 +11,11 @@ benchmark template has one additional element in its serialization that contains
 the specification of the result schema.
 """
 
-from robtmpl.template.benchmark.base import BenchmarkTemplate
-from robtmpl.template.benchmark.schema import BenchmarkResultSchema
+from robtmpl.benchmark.base import BenchmarkTemplate
+from robtmpl.benchmark.schema import BenchmarkResultSchema
 from robtmpl.template.loader import DefaultTemplateLoader
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 
 
 """Additional top-level elements of dictionary serialization for benchmark
@@ -49,12 +49,12 @@ class BenchmarkTemplateLoader(DefaultTemplateLoader):
 
         Returns
         -------
-        robtmpl.template.benchmark.base.BenchmarkTemplate
+        robtmpl.benchmark.base.BenchmarkTemplate
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
-        robtmpl.error.UnknownParameterError
+        robtmpl.core.error.InvalidTemplateError
+        robtmpl.core.error.UnknownParameterError
         """
         # Ensure that the mandatory elements are present
         if not LABEL_RESULTS in doc:
@@ -84,7 +84,7 @@ class BenchmarkTemplateLoader(DefaultTemplateLoader):
 
         Parameters
         ----------
-        template: robtmpl.template.benchmark.base.BenchmarkTemplate
+        template: robtmpl.benchmark.base.BenchmarkTemplate
             Expects an instance of a benchmark template handle
 
         Returns

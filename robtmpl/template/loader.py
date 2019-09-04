@@ -20,7 +20,7 @@ from abc import abstractmethod
 
 from robtmpl.template.parameter.base import TemplateParameter
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 import robtmpl.core.util as util
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.parameter.util as putil
@@ -74,8 +74,8 @@ class TemplateLoader(object):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
-        robtmpl.error.UnknownParameterError
+        robtmpl.core.error.InvalidTemplateError
+        robtmpl.core.error.UnknownParameterError
         """
         raise NotImplementedError()
 
@@ -106,7 +106,7 @@ class TemplateLoader(object):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
+        robtmpl.core.error.InvalidTemplateError
         """
         doc = util.read_object(filename, format=format)
         return self.from_dict(
@@ -185,8 +185,8 @@ class DefaultTemplateLoader(TemplateLoader):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
-        robtmpl.error.UnknownParameterError
+        robtmpl.core.error.InvalidTemplateError
+        robtmpl.core.error.UnknownParameterError
         """
         # Ensure that the mandatory elements are present
         if not LABEL_WORKFLOW in doc:

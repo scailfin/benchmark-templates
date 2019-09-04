@@ -11,7 +11,7 @@ properties that are used to (i) identify the parameter, (ii) define a nested
 parameter structure, and (iii) render UI forms to collect parameter values.
 """
 
-from robtmpl.error import InvalidParameterError
+from robtmpl.core.error import InvalidParameterError
 
 import robtmpl.template.parameter.declaration as pd
 
@@ -40,7 +40,7 @@ class ParameterBase(object):
 
         Raises
         ------
-        robtmpl.error.InvalidParameterError
+        robtmpl.core.error.InvalidParameterError
         """
         if not data_type in pd.DATA_TYPES:
             raise InvalidParameterError('invalid data type \'{}\''.format(data_type))

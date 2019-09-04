@@ -72,7 +72,7 @@ class WorkflowEngine(object):
 
         Raises
         ------
-        robtmpl.error.UnknownRunError
+        robtmpl.core.error.UnknownRunError
         """
         raise NotImplementedError()
 

@@ -14,7 +14,7 @@ from robtmpl.core.io.files.base import FileHandle, InputFile
 from robtmpl.core.io.scanner import Scanner
 from robtmpl.template.parameter.base import TemplateParameter
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 import robtmpl.template.parameter.declaration as pd
 
 
@@ -39,8 +39,8 @@ def create_parameter_index(parameters, validate=True):
 
     Raises
     ------
-    robtmpl.error.InvalidTemplateError
-    robtmpl.error.UnknownParameterError
+    robtmpl.core.error.InvalidTemplateError
+    robtmpl.core.error.UnknownParameterError
     """
     result = dict()
     for para in parameters:

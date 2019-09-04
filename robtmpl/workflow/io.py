@@ -17,7 +17,7 @@ import shutil
 from robtmpl.core.io.files.base import FileHandle, InputFile
 from robtmpl.template.parameter.value import TemplateArgument
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 import robtmpl.template.base as tmpl
 
 
@@ -96,9 +96,9 @@ def upload_files(template, files, arguments, loader):
 
     Raises
     ------
-    robtmpl.error.InvalidTemplateError
-    robtmpl.error.MissingArgumentError
-    robtmpl.error.UnknownParameterError
+    robtmpl.core.error.InvalidTemplateError
+    robtmpl.core.error.MissingArgumentError
+    robtmpl.core.error.UnknownParameterError
     """
     for val in files:
         # Set source and target values depending on whether the list

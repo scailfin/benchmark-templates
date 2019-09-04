@@ -1,3 +1,11 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Test TemplateHandle functionality."""
 
 import os
@@ -10,7 +18,7 @@ from robtmpl.workflow.resource.base import ResourceDescriptor, LABEL_ID
 from robtmpl.template.base import TemplateHandle
 from robtmpl.template.loader import DefaultTemplateLoader
 
-import robtmpl.error as err
+import robtmpl.core.error as err
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.base as tmpl
 import robtmpl.template.loader as loader

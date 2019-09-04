@@ -46,7 +46,7 @@ class BenchmarkTemplate(TemplateHandle):
 
         Raises
         ------
-        robtmpl.error.InvalidTemplateError
+        robtmpl.core.error.InvalidTemplateError
         """
         super(BenchmarkTemplate, self).__init__(
             workflow_spec=workflow_spec,

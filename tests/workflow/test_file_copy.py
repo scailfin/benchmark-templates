@@ -1,17 +1,25 @@
+# This file is part of the Reproducible Open Benchmarks for Data Analysis
+# Platform (ROB).
+#
+# Copyright (C) 2019 NYU.
+#
+# ROB is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+
 """Test various methods that copy input and output files for workflow runs."""
 
 import os
 import pytest
 import shutil
 
-from robtmpl.workflow.backend.io import FileCopy
+from robtmpl.workflow.io import FileCopy
 from robtmpl.core.io.files.base import FileHandle
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.template.base import TemplateHandle
 from robtmpl.template.repo import TemplateRepository
 
-import robtmpl.error as err
-import robtmpl.workflow.backend.io as backend
+import robtmpl.core.error as err
+import robtmpl.workflow.io as backend
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
