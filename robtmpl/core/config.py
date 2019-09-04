@@ -22,7 +22,7 @@ import robtmpl.core.error as err
 
 """Environment variables to configure the database driver."""
 ROB_DB_CONNECT = 'ROB_DBCONNECT'
-ROB_DB_ID = 'ROB_DBIDENTIFIER'
+ROB_DB_ID = 'ROB_DBMS'
 
 
 """Environment variable for test purposes."""
@@ -59,15 +59,15 @@ def DB_CONNECT(default_value=None, raise_error=False):
 
 def DB_IDENTIFIER(default_value=None, raise_error=False):
     """Get the identifier for the database management system from the respective
-    environment variable 'ROB_DBIDENTIFIER'. Raises a MissingConfigurationError if
-    the raise_error flag is True and 'ROB_DBIDENTIFIER' is not set. If the
-    raise_error flag is False and 'ROB_DBIDENTIFIER' is not set the default value is
+    environment variable 'ROB_DBMS'. Raises a MissingConfigurationError if
+    the raise_error flag is True and 'ROB_DBMS' is not set. If the
+    raise_error flag is False and 'ROB_DBMS' is not set the default value is
     returned.
 
     Parameters
     ----------
     default_value: string, optional
-        Default value if 'ROB_DBIDENTIFIER' is not set and raise_error flag is False
+        Default value if 'ROB_DBMS' is not set and raise_error flag is False
     raise_error: bool, optional
         Flag indicating whether an error is raised if the environment variable
         is not set (i.e., None or and empty string '')

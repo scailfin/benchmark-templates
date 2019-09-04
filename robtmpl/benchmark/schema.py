@@ -57,7 +57,7 @@ class BenchmarkResultColumn(object):
             Indicates whether a value is expected for this column in every
             benchmark run result
         is_default: bool, optional
-            Indicates whether this column is the default csort column for the
+            Indicates whether this column is the default sort column for the
             benchmark leaderboard
         sort_order: string, optional
             Sort order for this column when generating the leaderboard

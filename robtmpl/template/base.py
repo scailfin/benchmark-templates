@@ -80,7 +80,7 @@ class TemplateHandle(object):
 
         Returns
         -------
-        dict
+        robtmpl.template.parameter.base.TemplateParameter
         """
         return self.parameters.get(identifier)
 

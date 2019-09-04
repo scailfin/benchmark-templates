@@ -16,7 +16,7 @@ underlying database are specified using a unique database system identifier and
 a system-specific connection string.
 
 The database driver can be configured using the environment variables
-ROB_DBIDENTIFIER and ROB_DBCONNECT
+ROB_DBMS and ROB_DBCONNECT
 """
 
 import os

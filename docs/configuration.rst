@@ -10,9 +10,9 @@ All components of the *Reproducible Open Benchmarks for Data Analysis Platform (
 Database
 --------
 
-Database connections are established using the environment variables **ROB_DBIDENTIFIER** and **ROB_DBCONNECT**.
+Database connections are established using the environment variables **ROB_DBMS** and **ROB_DBCONNECT**.
 
-- **ROB_DBIDENTIFIER**: Determines the type of the database system that is used. **ROB** currently supports the following two database systems: `SQLite <https://sqlite.org/index.html>`_ (identified by either ``SQLITE`` or ``SQLITE3``) and `PostgreSQL <https://www.postgresql.org/>`_ (identified by ``POSTGRES``, ``POSTGRESQL``, ``PSQL``, or ``PG``).
+- **ROB_DBMS**: Determines the type of the database system that is used. **ROB** currently supports the following two database systems: `SQLite <https://sqlite.org/index.html>`_ (identified by either ``SQLITE`` or ``SQLITE3``) and `PostgreSQL <https://www.postgresql.org/>`_ (identified by ``POSTGRES``, ``POSTGRESQL``, ``PSQL``, or ``PG``).
 
 - **ROB_DBCONNECT**: Database connection information. The value is used to establish a connection with the database server. The format and content of the string is dependent on the database system that is being used.
 

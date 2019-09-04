@@ -4,6 +4,13 @@ Repositories for Workflow Templates and Benchmarks
 
 The package contains implementations for repositories to maintain workflow templates and extended benchmark templates. Most of the relevant information is stored in separate directories and files on the file system. The **Benchmark Repository** in addition maintains some information in a relational database.
 
+The UML diagram for the relevant classes is shown below:
+
+.. figure:: figures/repository.png
+   :scale: 50 %
+   :alt: UML Diagram for Repositories
+
+UML Diagram of classes that are relevant for workflow template and benchmark repositories.
 
 
 Template Repositories
