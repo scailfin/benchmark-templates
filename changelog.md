@@ -16,6 +16,7 @@
 * Change behavior of resource descriptor serialization
 
 
-### 0.2.0 - 2019-08-28
+### 0.2.0 - (ongoing))
 
 * Allow users to specify target path for uploaded files
+* Rename main package to robtmpl

@@ -29,7 +29,7 @@ extras_require = {
 
 
 setup(
-    name='benchmark-templates',
+    name='rob-templates',
     version='0.2.0',
     description='Workflow Templates for Reproducible Data Analysis Benchmarks',
     long_description=readme,

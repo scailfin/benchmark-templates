@@ -15,11 +15,24 @@ import json
 import sys
 import yaml
 
-from benchtmpl.workflow.parameter.declaration import PARAMETER_SCHEMA
+from robtmpl.template.parameter.declaration import PARAMETER_SCHEMA
 
 
 def main(args):
-    """
+    """Print or write JSON schema for parameter declaration. Expects at most two
+    arguments:
+
+    1) Output format (either JSON or YAML)
+    2) Output file
+
+    If only one argument is given it is assumed to be the output format. If no
+    output file is given the schema will be printed to STDOUT. If no arguments
+    are given the default output format is JSON.
+
+    Parameters
+    ----------
+    args: list(string)
+        List of command line arguments.
     """
     # Ensure that at most two arguments are given
     if len(args) > 2:

@@ -4,10 +4,10 @@ from standard input.
 
 import pytest
 
-from benchtmpl.io.scanner import Scanner, ListReader
-from benchtmpl.workflow.parameter.base import TemplateParameter
+from robtmpl.core.io.scanner import Scanner, ListReader
+from robtmpl.template.parameter.base import TemplateParameter
 
-import benchtmpl.workflow.parameter.declaration as pd
+import robtmpl.template.parameter.declaration as pd
 
 
 class TestScanner(object):

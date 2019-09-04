@@ -1,7 +1,7 @@
 [run]
 branch = true
 parallel = true
-source = benchtmpl
+source = robtmpl
 
 [report]
 show_missing = true

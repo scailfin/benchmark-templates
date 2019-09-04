@@ -4,11 +4,11 @@ import datetime as dt
 import os
 import pytest
 
-from benchtmpl.workflow.state import (
+from robtmpl.workflow.state import (
     StateError, StatePending, StateRunning, StateSuccess, WorkflowState,
     LABEL_STATE_TYPE
 )
-from benchtmpl.workflow.resource.base import FileResource
+from robtmpl.workflow.resource.base import FileResource
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 LOCAL_FILE = os.path.join(DIR, '../.files/schema.json')

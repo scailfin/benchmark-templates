@@ -1,7 +1,7 @@
 """Test input file handle."""
 
 
-from benchtmpl.io.files.base import FileHandle, InputFile
+from robtmpl.core.io.files.base import FileHandle, InputFile
 
 
 class TestInputFile(object):

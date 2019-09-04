@@ -4,8 +4,8 @@ import datetime
 import os
 import pytest
 
-from benchtmpl.io.files.store import Filestore
-from benchtmpl.util.tests import FakeStream
+from robtmpl.core.io.files.store import Filestore
+from robtmpl.core.tests import FakeStream
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
