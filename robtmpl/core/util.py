@@ -31,6 +31,10 @@ def create_dir(directory):
     ----------
     directory: string
         Path to directory that is being created.
+
+    Returns
+    -------
+    string
     """
     # Based on https://stackoverflow.com/questions/273192/how-can-i-safely-create-a-nested-directory
     if not os.path.exists(directory):
@@ -39,6 +43,7 @@ def create_dir(directory):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+    return directory
 
 
 def get_unique_identifier():

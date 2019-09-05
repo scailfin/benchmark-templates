@@ -11,10 +11,14 @@
 import os
 import pytest
 
-from robtmpl.core.db.sqlite import SQLiteConnector
+from robtmpl.core.db.driver import DatabaseDriver
+
+import robtmpl.core.config as config
+import robtmpl.core.db.driver as driver
+
 
 DIR = os.path.dirname(os.path.realpath(__file__))
-SCHEMA_FILE = os.path.join(DIR, '../../.files/db/testdb.sql')
+DML_FILE = os.path.join(DIR, '../../../.files/db/testdb.sql')
 
 
 class TestSQLiteConnector(object):
@@ -22,16 +26,23 @@ class TestSQLiteConnector(object):
     init_db() methods.
     """
     def test_create_db(self, tmpdir):
-        """test connectimg to a database and executing a script."""
+        """Use the database driver init_db method to test connecting to a SQLite
+        database and executing a script.
+        """
         # The connect string references a new database file in the tmpdir
-        connect_string = '{}/my.db'.format(str(tmpdir))
+        connect_string = '{}/{}'.format(str(tmpdir), config.DEFAULT_DATABASE)
         # Create a new empty database
-        db = SQLiteConnector(connect_string=connect_string)
-        db.init_db(schema_file=SCHEMA_FILE)
+        dbms_id = driver.SQLITE[0]
+        DatabaseDriver.init_db(dbms_id=dbms_id, connect_string=connect_string)
+        db = DatabaseDriver.get_connector(
+            dbms_id=dbms_id,
+            connect_string=connect_string
+        )
+        db.execute(DML_FILE)
         with db.connect() as con:
-            rs = con.execute('SELECT * FROM user').fetchall()
+            rs = con.execute('SELECT * FROM template').fetchall()
             assert len(rs) == 2
+            assert rs[0]['id'] == '1234'
             assert rs[0]['name'] == 'Alice'
-            assert rs[0]['age'] == 30
+            assert rs[1]['id'] == '5678'
             assert rs[1]['name'] == 'Bob'
-            assert rs[1]['age'] == 25

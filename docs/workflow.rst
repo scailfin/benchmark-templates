@@ -92,10 +92,146 @@ An example template for the **Hello World example** is shown below.
 
 In this example, the workflow section is a REANA workflow specification. The main modification to the workflow specification is a simple addition to the syntax in order to allow references to template parameters. Such references are always enclosed in ``$[[...]]``. The parameters section is a list of template parameter declarations. Each parameter declaration has a unique identifier. The identifier is used to reference the parameter from within the workflow specification (e.g., ``$[[sleeptime]]`` to reference the user-provided value for the sleep period). Other elements of the parameter declaration are a human readable short name, a parameter description, and a specification of the data type. Refer to the `Template Parameter Specification <https://github.com/scailfin/benchmark-templates/blob/master/docs/parameters.rst>`_ for a full description of the template parameter syntax.
 
-
-Usage of Parameterized Workflow Templates
-=========================================
-
 Parameter declarations are intended to be used by front-end tools to render forms that collect user input. Given a set of user-provided values for the template parameters, the references to parameters are replaced withing the workflow specification with the given values to generate a valid workflow specification that can be executed by the respective workflow engine.
 
-The definition of workflow templates is intended to be generic to allow usage in a variety of applications. With respect to *Reproducible Open Benchmarks* templates are used to define the benchark wroflow, the variable parts of the benchmark that are provided by the paricipants, and to describe the format of benchmark results that are used to generate the benchmark leaderboard. For this purpose, we define `Benchmark templates <https://github.com/scailfin/benchmark-templates/blob/master/docs/benchmark.rst>`_ that extend the base templates with information about the schema of the benchmark results.
+
+
+Benchmark Templates
+===================
+
+The definition of workflow templates is intended to be generic to allow usage in a variety of applications. With respect to *Reproducible Open Benchmarks* we define an extension templates define the benchmark workflow and the variable parts of the benchmark that are provided by the paricipants. To further describe the format of benchmark results that are used to generate the benchmark leaderboard, we define an extension.
+
+
+**Benchmark Templates** extend the base templates with information about the schema of the benchmark results. The idea is that benchmark workflows contain steps towards the end that evaluate the results of a benchmark run. These evaluation results are stored in a simple JSON or YAML file. Result files are usedto create the benchmark leaderboard.
+
+
+Benchmark Results
+-----------------
+
+Benchmark templates add a ``results`` section to a parameterized workflow template.
+
+.. code-block:: yaml
+
+    workflow:
+        version: 0.3.0
+        inputs:
+          files:
+            - code/analyze.py
+            - code/helloworld.py
+            - $[[names]]
+          parameters:
+            inputfile: $[[names]]
+            outputfile: results/greetings.txt
+            sleeptime: $[[sleeptime]]
+            greeting: $[[greeting]]
+        workflow:
+          type: serial
+          specification:
+            steps:
+              - environment: 'python:3.7'
+                commands:
+                  - python code/helloworld.py
+                      --inputfile "${inputfile}"
+                      --outputfile "${outputfile}"
+                      --sleeptime ${sleeptime}
+                      --greeting ${greeting}
+                  - python code/analyze.py
+                      --inputfile "${outputfile}"
+                      --outputfile results/analytics.json
+        outputs:
+          files:
+           - results/greetings.txt
+           - results/analytics.json
+    parameters:
+        - id: names
+          name: 'Input file'
+          datatype: file
+          as: data/names.txt
+        - id: sleeptime
+          datatype: int
+          defaultValue: 10
+        - id: greeting
+          datatype: string
+          defaultValue: 'Hello'
+    results:
+        file: results/analytics.json
+        schema:
+            - id: avg_count
+              name: 'Avg. Chars per Line'
+              type: decimal
+            - id: max_len
+              name: 'Max. Output Line'
+              type: decimal
+            - id: max_line
+              name: 'Longest Output'
+              type: string
+              required: False
+
+The ``results`` section has two parts: (1) a reference to the result ``file `` that contains the benchmark run results, and (2) a specification of the elements (columns) in the benchmark result ``schema``. The latter is used to extract information from the result file and store the results in a database for the benchmark leaderboard.
+
+In this particular example the benchmark results contain the average number of characters per line that is written by ``helloworld.py``, and the length and text of the longest line in the output.
+
+The benchmark results are generated by the second command in the workflow step by the ``analyze.py`` script that is part of the benchmark template.
+
+.. code-block:: python
+
+    """Analytics code for the adopted hello workd Demo. Reads a text file (as
+    produced by the helloworld.py code) and outputs the average number of characters
+    per line and the number of characters in the line with the most characters.
+    """
+
+    from __future__ import absolute_import, division, print_function
+
+    import argparse
+    import errno
+    import os
+    import json
+    import sys
+
+
+    def main(inputfile, outputfile):
+        """Write greeting for every name in a given input file to the output file.
+        The optional waiting period delays the output between each input name.
+        """
+        # Count number of lines, characters, and keep track of the longest line
+        max_line = ''
+        total_char_count = 0
+        line_count = 0
+        with open(inputfile, 'r') as f:
+            for line in f:
+                line = line.strip()
+                line_length = len(line)
+                total_char_count += line_length
+                line_count += 1
+                if line_length > len(max_line):
+                    max_line = line
+        # Create results object
+        results = {
+            'avg_count': total_char_count / line_count,
+            'max_len': len(max_line),
+            'max_line': max_line
+        }
+        # Write analytics results. Ensure that output directory exists:
+        # influenced by http://stackoverflow.com/a/12517490
+        dir_name = os.path.dirname(outputfile)
+        if dir_name != '':
+            if not os.path.exists(dir_name):
+                try:
+                    os.makedirs(dir_name)
+                except OSError as exc:  # guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+        with open(outputfile, "w") as f:
+            json.dump(results, f)
+
+
+    if __name__ == '__main__':
+        args = sys.argv[1:]
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-i", "--inputfile", required=True)
+        parser.add_argument("-o", "--outputfile", required=True)
+
+        parsed_args = parser.parse_args(args)
+
+        main(inputfile=parsed_args.inputfile, outputfile=parsed_args.outputfile)

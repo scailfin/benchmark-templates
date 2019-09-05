@@ -25,4 +25,4 @@ About
 More Information
 ================
 
-The `Workflow Templates Section <https://github.com/scailfin/benchmark-templates/blob/master/docs/workflow.rst>`_ provides further information about templates and their syntax. `Benchmark Templates <https://github.com/scailfin/benchmark-templates/blob/master/docs/benchmark.rst>`_ are an extension of the base templates. These templates are used by the `Reproducible Benchmark Engine <https://github.com/scailfin/benchmark-engine>`_ to run benchmark workflows and maintain benchmark results.
+The `Workflow Templates Section <https://github.com/scailfin/benchmark-templates/blob/master/docs/workflow.rst>`_ provides further information about templates and their syntax. These templates are used by the `Reproducible Benchmark Engine <https://github.com/scailfin/benchmark-engine>`_ to run benchmark workflows and maintain benchmark results.

@@ -45,7 +45,7 @@ class WorkflowEngine(object):
 
         Parameters
         ----------
-        template: robtmpl.template.base.TemplateHandle
+        template: robtmpl.template.base.WorkflowTemplate
             Workflow template containing the parameterized specification and the
             parameter declarations
         arguments: dict(robtmpl.template.parameter.value.TemplateArgument)

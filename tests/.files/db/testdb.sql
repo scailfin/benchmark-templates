@@ -1,7 +1,2 @@
-CREATE TABLE user(
-    name VARCHAR(8) NOT NULL,
-    age INTEGER NOT NULL
-);
-
-INSERT INTO user(name, age) VALUES('Alice', 30);
-INSERT INTO user(name, age) VALUES('Bob', 25);
+INSERT INTO template(id, name) VALUES('1234', 'Alice');
+INSERT INTO template(id, name) VALUES('5678', 'Bob');

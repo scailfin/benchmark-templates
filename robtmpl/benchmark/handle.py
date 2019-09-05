@@ -18,51 +18,12 @@ used to generate the overall benchmark leaderboard.
 The structure of the benchmark result element is defined in the schema module.
 """
 
-from robtmpl.template.base import TemplateHandle
-
-
-class BenchmarkTemplate(TemplateHandle):
-    """Extended workflow template for data analytics benchmarks that adds the
-    result schema object to the base template.
-    """
-    def __init__(self, workflow_spec, schema, identifier=None, base_dir=None, parameters=None):
-        """Initialize the components of the benchmark template. A super class
-        raises an error if the identifier of template parameters are not unique.
-
-        Parameters
-        ----------
-        workflow_spec: dict
-            Workflow specification object
-        schema: robtmpl.workflow.benachmark.schema.BenchmarkResultSchema
-            Schema of the result file that is generated for each workflow run
-        identifier: string, optional
-            Unique template identifier. If no value is given a UUID will be
-            assigned.
-        base_dir: string, optional
-            Optional path to directory on disk that contains static files that
-            are required to run the represented workflow
-        parameters: list(robtmpl.template.parameter.base.TemplateParameter), optional
-            List of workflow template parameter declarations
-
-        Raises
-        ------
-        robtmpl.core.error.InvalidTemplateError
-        """
-        super(BenchmarkTemplate, self).__init__(
-            workflow_spec=workflow_spec,
-            identifier=identifier,
-            base_dir=base_dir,
-            parameters=parameters
-        )
-        self.schema = schema
-
-
 """Prefix for all benchmark result tables. The table name is a concatenation of
 the prefix and the template identifier.
 """
-PREFIX_RESULT_TABLE = 'res_'
+PREFIX_RESULT_TABLE = 'bm_'
 
-class BenchmarkDescriptor(object):
+class TemplateHandle(object):
     """The basic information for benchmarks in listings contains the unique
     identifier, name, an optional short description, and an optional set of
     instructions.
@@ -108,9 +69,16 @@ class BenchmarkDescriptor(object):
         return not self.instructions is None
 
 
-class BenchmarkHandle(BenchmarkDescriptor):
+class TemplateHandle(object):
     """The benchmark handle extends the descriptor with a reference to the
     associated workflow template.
+
+    The basic information for benchmarks in listings contains the unique
+    identifier, name, an optional short description, and an optional set of
+    instructions.
+
+    Both, the identifier and the name of a benchmark ar unique. The name is
+    used to identify the benchmark in listings that are visible to the user.
     """
     def __init__(self, con, template, name, description=None, instructions=None):
         """Initialize the descriptor attributes and the reference to the
@@ -130,12 +98,10 @@ class BenchmarkHandle(BenchmarkDescriptor):
         instructions: string, optional
             Text containing detailed instructions for benchmark participants
         """
-        super(BenchmarkHandle, self).__init__(
-            identifier=template.identifier,
-            name=name,
-            description=description,
-            instructions=instructions
-        )
+        self.identifier = identifier
+        self.name = name
+        self.description = description
+        self.instructions = instructions
         self.con = con
         self.template = template
         # The result table name is the concatenation of the common prefix and
@@ -214,6 +180,23 @@ class BenchmarkHandle(BenchmarkDescriptor):
             leaderboard.append(LeaderboardEntry(user=user, results=result))
         return leaderboard
 
+    def has_description(self):
+        """Shortcut to test of the description attribute is set.
+
+        Returns
+        -------
+        bool
+        """
+        return not self.description is None
+
+    def has_instructions(self):
+        """Test if the instructions for the benchmark are set.
+
+        Returns
+        -------
+        bool
+        """
+        return not self.instructions is None
 
     def insert_results(self, run_id, results):
         """Insert the results of a benchmark run into the results table. Expects
@@ -228,7 +211,7 @@ class BenchmarkHandle(BenchmarkDescriptor):
 
         Raises
         ------
-        benchengine.error.ConstraintViolationError
+        benchengine.error.ROBError
         """
         columns = list(['run_id'])
         values = list([run_id])
@@ -236,7 +219,7 @@ class BenchmarkHandle(BenchmarkDescriptor):
             if col.identifier in results:
                 values.append(results[col.identifier])
             elif col.required:
-                raise err.ConstraintViolationError('missing result for \'{}\''.format(col.identifier))
+                raise err.ROBError('missing result for \'{}\''.format(col.identifier))
             else:
                 values.append(None)
             columns.append(col.identifier)

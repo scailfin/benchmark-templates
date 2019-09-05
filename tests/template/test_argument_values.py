@@ -13,12 +13,11 @@ import pytest
 
 from robtmpl.core.io.files.base import FileHandle, InputFile
 from robtmpl.template.parameter.base import TemplateParameter
-from robtmpl.template.base import TemplateHandle
-from robtmpl.template.loader import DefaultTemplateLoader
+from robtmpl.template.base import WorkflowTemplate
 
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.parameter.value as values
-import robtmpl.template.loader as tmpl
+import robtmpl.template.base as tmpl
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
@@ -32,7 +31,7 @@ class TestArgumentValues(object):
     def test_flat_parse(self):
         """Test parsing arguments for a flat (un-nested) parameter declaration.
         """
-        template = TemplateHandle(
+        template = WorkflowTemplate(
             workflow_spec=dict(),
             parameters=[
                 TemplateParameter(pd.parameter_declaration('A', data_type=pd.DT_INTEGER)),
@@ -93,7 +92,7 @@ class TestArgumentValues(object):
 
     def test_nested_parse(self):
         """Test parsing arguments for a nested parameter declaration."""
-        template = DefaultTemplateLoader().from_dict({
+        template = WorkflowTemplate.from_dict({
                 tmpl.LABEL_WORKFLOW: dict(),
                 tmpl.LABEL_PARAMETERS: [
                     pd.parameter_declaration('A', data_type=pd.DT_INTEGER),

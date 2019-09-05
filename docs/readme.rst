@@ -9,4 +9,4 @@ About
 More Information
 ================
 
-The :doc:`workflow` provides further information about templates and their syntax. :doc:`benchmark` are an extension of the base templates. These templates are used by the `Reproducible Benchmark Engine <https://github.com/scailfin/benchmark-engine>`_ to run benchmark workflows and maintain benchmark results.
+The :doc:`workflow` provides further information about templates and their syntax. These templates are used by the `Reproducible Benchmark Engine <https://github.com/scailfin/benchmark-engine>`_ to run benchmark workflows and maintain benchmark results.

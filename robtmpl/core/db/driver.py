@@ -20,9 +20,15 @@ ROB_DBMS and ROB_DBCONNECT
 """
 
 import os
+import pkg_resources
 
 import robtmpl.core.config as config
 import robtmpl.core.util as util
+
+
+"""Default database system identifier."""
+SQLITE = ['SQLITE', 'SQLITE3']
+POSTGRES = ['POSTGRES', 'POSTGRESQL', 'PSQL', 'PG']
 
 
 class DatabaseDriver(object):
@@ -77,13 +83,45 @@ class DatabaseDriver(object):
             connect_string = config.DB_CONNECT(raise_error=True)
         # Return the connector for the identified database management system.
         # Raises ValueError if the given identifier is unknown.
-        if dbms_id.upper() in ['SQLITE', 'SQLITE3']:
+        if dbms_id.upper() in SQLITE:
             # -- SQLite database -----------------------------------------------
             from robtmpl.core.db.sqlite import SQLiteConnector
             return SQLiteConnector(connect_string=connect_string)
-        elif dbms_id.upper() in ['POSTGRES', 'POSTGRESQL', 'PSQL', 'PG']:
+        elif dbms_id.upper() in POSTGRES:
             # -- PostgreSQL database -------------------------------------------
             from robtmpl.core.db.pg import PostgresConnector
             return PostgresConnector(connect_string=connect_string)
         else:
             raise ValueError('unknown database system \'{}\''.format(dbms_id))
+
+    @staticmethod
+    def init_db(dbms_id=None, connect_string=None):
+        """Initialize the database from the schema definition files in the
+        resources folder.
+
+        Add names of files here if they contain DML or DDL statements that are
+        to be executed when the database is initialized.
+
+        The given parameters are used to establish the connection to the
+        database.
+
+        Parameters
+        ----------
+        dbms_id: string
+            Unique identifier for the database management system
+        connect_string: string
+            Database system specific information to establish a connection to
+            an existing database
+        """
+        # Add names of files here if they contain statements to be executed
+        # when the database is initialized. Files are executed in the order
+        # of the list.
+        scripts = ['../resources/db/benchrepo.sql']
+        # Get a database connector
+        db = DatabaseDriver.get_connector(
+            dbms_id=dbms_id,
+            connect_string=connect_string
+        )
+        # Execute the database scripts
+        for script_file in scripts:
+            db.execute(pkg_resources.resource_filename('robtmpl', script_file))

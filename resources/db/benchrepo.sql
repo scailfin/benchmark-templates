@@ -19,13 +19,13 @@
 -- Drop all tables (if they exist)
 --
 DROP TABLE IF EXISTS benchmark_run;
-DROP TABLE IF EXISTS benchmark;
+DROP TABLE IF EXISTS template;
 
 --
--- Each benchmark has a unique identifier and name, a short descriptor and a
--- set of instructions.
+-- Each template has a unique identifier and name, an optional short descriptor
+-- and an optional set of instructions.
 --
-CREATE TABLE benchmark(
+CREATE TABLE template(
     id CHAR(32) NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -39,8 +39,8 @@ CREATE TABLE benchmark(
 -- different stages of the executed workflow.
 --
 CREATE TABLE benchmark_run(
-    id CHAR(32) NOT NULL,
-    benchmark CHAR(32) NOT NULL REFERENCES benchmark(id),
+    run_id CHAR(32) NOT NULL,
+    template_id CHAR(32) NOT NULL REFERENCES template(id),
     state VARCHAR(8) NOT NULL,
     created_at CHAR(26) NOT NULL,
     started_at CHAR(26),

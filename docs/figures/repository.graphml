@@ -34,40 +34,51 @@
 		<y:SharedData>
 			<yjs:SolidColorFill x:Key="1" color="#FF607D8B"/>
 			<yjs:SolidColorFill x:Key="2" color="#FFA3F1BB"/>
-			<yjs:Stroke x:Key="3" fill="#FF000000"/>
-			<yjs:Stroke x:Key="4" fill="#FF000000"/>
-			<yjs:PolylineEdgeStyle x:Key="5" stroke="{y:GraphMLReference 4}">
+			<yjs:SolidColorFill x:Key="3" color="#FF607D8B"/>
+			<yjs:SolidColorFill x:Key="4" color="#FFA3F1BB"/>
+			<yjs:Stroke x:Key="5" fill="#FF000000"/>
+			<yjs:Stroke x:Key="6" fill="#FF000000"/>
+			<yjs:PolylineEdgeStyle x:Key="7" stroke="{y:GraphMLReference 6}">
 				<yjs:PolylineEdgeStyle.targetArrow>
-					<yjs:Arrow stroke="{y:GraphMLReference 4}" fill="#FF000000"/>
+					<yjs:Arrow stroke="{y:GraphMLReference 6}" fill="#FF000000"/>
 				</yjs:PolylineEdgeStyle.targetArrow>
+			</yjs:PolylineEdgeStyle>
+			<yjs:Stroke x:Key="8" fill="#FF000000"/>
+			<yjs:PolylineEdgeStyle x:Key="9" stroke="{y:GraphMLReference 8}">
+				<yjs:PolylineEdgeStyle.sourceArrow>
+					<yjs:Arrow type="TRIANGLE" stroke="{y:GraphMLReference 8}" fill="#FFFFFFFF"/>
+				</yjs:PolylineEdgeStyle.sourceArrow>
 			</yjs:PolylineEdgeStyle>
 		</y:SharedData>
 	</data>
 	<graph id="G" edgedefault="directed">
 		<data key="d5">
-			<y:Json>{"version":"2.0.0","theme":{"name":"light","version":"1.0.0"},"layout":"layout-uml","config":{"noObf_useDrawingAsSketch":false,"noObf_selectedElementsIncrementally":false,"noObf_nodeToNodeDistance":30,"noObf_automaticEdgeGroupingEnabled":false,"noObf_considerNodeLabels":true,"noObf_edgeLabeling":0,"noObf_orientation":0}}</y:Json>
+			<y:Json>{"version":"2.0.0","layout":"layout-uml","config":{"noObf_useDrawingAsSketch":false,"noObf_selectedElementsIncrementally":false,"noObf_nodeToNodeDistance":30,"noObf_automaticEdgeGroupingEnabled":false,"noObf_considerNodeLabels":true,"noObf_edgeLabeling":0,"noObf_orientation":0},"theme":{"name":"light","version":"1.0.0"}}</y:Json>
 		</data>
 		<node id="n0">
 			<data key="d4">
-				<y:RectD X="404.2484126984127" Y="0" Width="125" Height="220"/>
+				<y:RectD X="404.2484341772749" Y="0" Width="144.8745602168789" Height="252"/>
 			</data>
 			<data key="d6">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
 					<uml:UMLNodeStyle.model>
-						<uml:UMLClassModel stereotype="" constraint="" className="TemplateHandle" attributesOpen="true" operationsOpen="true">
+						<uml:UMLClassModel stereotype="" constraint="" className="WorkflowTemplate" attributesOpen="true" operationsOpen="true">
 							<uml:UMLClassModel.attributes>
 								<x:Array Type="sys:Object">
 									<sys:String>workflow_spec</sys:String>
 									<sys:String>identifier</sys:String>
-									<sys:String>base_dir</sys:String>
-									<sys:String>parameters</sys:String>
+									<sys:String>result_schema</sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
 								<x:Array Type="sys:Object">
+									<sys:String>from_dict()</sys:String>
 									<sys:String>get_parameter()</sys:String>
+									<sys:String>get_schema()</sys:String>
+									<sys:String>has_schema()</sys:String>
 									<sys:String>list_parameters()</sys:String>
-									<sys:String>validate_argument()</sys:String>
+									<sys:String>to_dict()</sys:String>
+									<sys:String>validate_arguments()</sys:String>
 								</x:Array>
 							</uml:UMLClassModel.operations>
 						</uml:UMLClassModel>
@@ -76,54 +87,18 @@
 			</data>
 			<port name="p0">
 				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="0.5,1"/>
+					<y:FreeNodePortLocationModelParameter Ratio="1,0.5" Offset="2.842170943040401e-14,0"/>
 				</data>
 			</port>
 			<port name="p1">
-				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="1,0.5"/>
-				</data>
-			</port>
-		</node>
-		<node id="n1">
-			<data key="d4">
-				<y:RectD X="404.2484126984127" Y="293" Width="125" Height="108"/>
-			</data>
-			<data key="d6">
-				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
-					<uml:UMLNodeStyle.model>
-						<uml:UMLClassModel stereotype="" constraint="" className="BenchmarkTemplate" attributesOpen="true" operationsOpen="false">
-							<uml:UMLClassModel.attributes>
-								<x:Array Type="sys:Object">
-									<sys:String>schema</sys:String>
-								</x:Array>
-							</uml:UMLClassModel.attributes>
-							<uml:UMLClassModel.operations>
-								<x:Array Type="sys:Object"/>
-							</uml:UMLClassModel.operations>
-						</uml:UMLClassModel>
-					</uml:UMLNodeStyle.model>
-				</uml:UMLNodeStyle>
-			</data>
-			<port name="p0">
-				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="0.5,0"/>
-				</data>
-			</port>
-			<port name="p1">
-				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="1,0.5"/>
-				</data>
-			</port>
-			<port name="p2">
 				<data key="d15">
 					<y:FreeNodePortLocationModelParameter Ratio="0,0.5"/>
 				</data>
 			</port>
 		</node>
-		<node id="n2">
+		<node id="n1">
 			<data key="d4">
-				<y:RectD X="216.24841269841272" Y="285" Width="158" Height="124"/>
+				<y:RectD X="216.24841269841272" Y="56" Width="158" Height="124"/>
 			</data>
 			<data key="d6">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -144,18 +119,18 @@
 			</data>
 			<port name="p0">
 				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="1,0.5"/>
+					<y:FreeNodePortLocationModelParameter Ratio="0,0.5"/>
 				</data>
 			</port>
 			<port name="p1">
 				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="0,0.5"/>
+					<y:FreeNodePortLocationModelParameter Ratio="1,0.5"/>
 				</data>
 			</port>
 		</node>
-		<node id="n3">
+		<node id="n2">
 			<data key="d4">
-				<y:RectD X="35.000035704758986" Y="253" Width="151.24834128889472" Height="188"/>
+				<y:RectD X="35.000035704758986" Y="24" Width="151.24834128889472" Height="188"/>
 			</data>
 			<data key="d6">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -184,23 +159,27 @@
 				</data>
 			</port>
 		</node>
-		<node id="n4">
+		<node id="n3">
 			<data key="d4">
-				<y:RectD X="559.2484126984127" Y="32" Width="125" Height="156"/>
+				<y:RectD X="579.123037351878" Y="8" Width="144.8745602168789" Height="220"/>
 			</data>
 			<data key="d6">
-				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
+				<uml:UMLNodeStyle fill="{y:GraphMLReference 3}" highlightFill="{y:GraphMLReference 4}">
 					<uml:UMLNodeStyle.model>
-						<uml:UMLClassModel stereotype="" constraint="" className="TemplateRepository" attributesOpen="true" operationsOpen="true">
+						<uml:UMLClassModel stereotype="" constraint="" className="TemplateHandle" attributesOpen="true" operationsOpen="true">
 							<uml:UMLClassModel.attributes>
 								<x:Array Type="sys:Object">
-									<sys:String>base_dir</sys:String>
+									<sys:String>identifier</sys:String>
+									<sys:String>name</sys:String>
+									<sys:String>description</sys:String>
+									<sys:String>instructions</sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
 								<x:Array Type="sys:Object">
-									<sys:String>add_template()</sys:String>
-									<sys:String>delete_template()</sys:String>
+									<sys:String>has_description()</sys:String>
+									<sys:String>has_instructions()</sys:String>
+									<sys:String>has_schema()</sys:String>
 									<sys:String>get_template()</sys:String>
 								</x:Array>
 							</uml:UMLClassModel.operations>
@@ -213,28 +192,30 @@
 					<y:FreeNodePortLocationModelParameter Ratio="0,0.5"/>
 				</data>
 			</port>
+			<port name="p1">
+				<data key="d15">
+					<y:FreeNodePortLocationModelParameter Ratio="0.5000000000000003,1"/>
+				</data>
+			</port>
 		</node>
-		<node id="n5">
+		<node id="n4">
 			<data key="d4">
-				<y:RectD X="559.2485137166077" Y="245" Width="140.21329002710206" Height="204"/>
+				<y:RectD X="589.0603174603175" Y="261" Width="125" Height="172"/>
 			</data>
 			<data key="d6">
-				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
+				<uml:UMLNodeStyle fill="#FFFF5722" highlightFill="#FFA3F1BB">
 					<uml:UMLNodeStyle.model>
-						<uml:UMLClassModel stereotype="" constraint="" className="BenchmarkHandle" attributesOpen="true" operationsOpen="true">
+						<uml:UMLClassModel stereotype="" constraint="abstract" className="TemplateRepository" attributesOpen="false" operationsOpen="true">
 							<uml:UMLClassModel.attributes>
-								<x:Array Type="sys:Object">
-									<sys:String>identifier</sys:String>
-									<sys:String>name</sys:String>
-									<sys:String>description</sys:String>
-									<sys:String>instructions</sys:String>
-									<sys:String>template</sys:String>
-								</x:Array>
+								<x:Array Type="sys:Object"/>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
 								<x:Array Type="sys:Object">
-									<sys:String>get_leaderboard()</sys:String>
-									<sys:String>insert_results()</sys:String>
+									<sys:String>add_template()</sys:String>
+									<sys:String>delete_template()</sys:String>
+									<sys:String>exists_template()</sys:String>
+									<sys:String>get_template()</sys:String>
+									<sys:String>list_templates()</sys:String>
 								</x:Array>
 							</uml:UMLClassModel.operations>
 						</uml:UMLClassModel>
@@ -243,7 +224,71 @@
 			</data>
 			<port name="p0">
 				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="1,0.5" Offset="1.1368683772161603e-13,0"/>
+					<y:FreeNodePortLocationModelParameter Ratio="0.5,0"/>
+				</data>
+			</port>
+			<port name="p1">
+				<data key="d15">
+					<y:FreeNodePortLocationModelParameter Ratio="0.5,1"/>
+				</data>
+			</port>
+		</node>
+		<node id="n5">
+			<data key="d4">
+				<y:RectD X="589.0603174603175" Y="458" Width="125" Height="124"/>
+			</data>
+			<data key="d6">
+				<uml:UMLNodeStyle fill="{y:GraphMLReference 3}" highlightFill="{y:GraphMLReference 4}">
+					<uml:UMLNodeStyle.model>
+						<uml:UMLClassModel stereotype="" constraint="" className="BenchmarkRepository" attributesOpen="true" operationsOpen="false">
+							<uml:UMLClassModel.attributes>
+								<x:Array Type="sys:Object">
+									<sys:String>base_dir</sys:String>
+									<sys:String>store</sys:String>
+								</x:Array>
+							</uml:UMLClassModel.attributes>
+							<uml:UMLClassModel.operations>
+								<x:Array Type="sys:Object"/>
+							</uml:UMLClassModel.operations>
+						</uml:UMLClassModel>
+					</uml:UMLNodeStyle.model>
+				</uml:UMLNodeStyle>
+			</data>
+			<port name="p0">
+				<data key="d15">
+					<y:FreeNodePortLocationModelParameter Ratio="0.5,0"/>
+				</data>
+			</port>
+			<port name="p1">
+				<data key="d15">
+					<y:FreeNodePortLocationModelParameter Ratio="1,0.5"/>
+				</data>
+			</port>
+		</node>
+		<node id="n6">
+			<data key="d4">
+				<y:RectD X="744.0603174603175" Y="458" Width="125" Height="124"/>
+			</data>
+			<data key="d6">
+				<uml:UMLNodeStyle fill="#FF4CAF50" highlightFill="#FFA3F1BB">
+					<uml:UMLNodeStyle.model>
+						<uml:UMLClassModel stereotype="interface" constraint="" className="TemplateStore" attributesOpen="false" operationsOpen="true">
+							<uml:UMLClassModel.attributes>
+								<x:Array Type="sys:Object"/>
+							</uml:UMLClassModel.attributes>
+							<uml:UMLClassModel.operations>
+								<x:Array Type="sys:Object">
+									<sys:String>read()</sys:String>
+									<sys:String>write()</sys:String>
+								</x:Array>
+							</uml:UMLClassModel.operations>
+						</uml:UMLClassModel>
+					</uml:UMLNodeStyle.model>
+				</uml:UMLNodeStyle>
+			</data>
+			<port name="p0">
+				<data key="d15">
+					<y:FreeNodePortLocationModelParameter Ratio="0.5,1"/>
 				</data>
 			</port>
 			<port name="p1">
@@ -252,24 +297,19 @@
 				</data>
 			</port>
 		</node>
-		<node id="n6">
+		<node id="n7">
 			<data key="d4">
-				<y:RectD X="729.4619404666637" Y="269" Width="151.24834128889472" Height="156"/>
+				<y:RectD X="744.0603174603175" Y="607" Width="125" Height="92"/>
 			</data>
 			<data key="d6">
-				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
+				<uml:UMLNodeStyle fill="{y:GraphMLReference 3}" highlightFill="{y:GraphMLReference 4}">
 					<uml:UMLNodeStyle.model>
-						<uml:UMLClassModel stereotype="" constraint="" className="BenchmarkRepository" attributesOpen="false" operationsOpen="true">
+						<uml:UMLClassModel stereotype="" constraint="" className="JsonFileStore" attributesOpen="false" operationsOpen="false">
 							<uml:UMLClassModel.attributes>
 								<x:Array Type="sys:Object"/>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
-								<x:Array Type="sys:Object">
-									<sys:String>add_benchmark()</sys:String>
-									<sys:String>delete_benchmark()</sys:String>
-									<sys:String>get_benchmark()</sys:String>
-									<sys:String>list_benchmarks()</sys:String>
-								</x:Array>
+								<x:Array Type="sys:Object"/>
 							</uml:UMLClassModel.operations>
 						</uml:UMLClassModel>
 					</uml:UMLNodeStyle.model>
@@ -277,42 +317,47 @@
 			</data>
 			<port name="p0">
 				<data key="d15">
-					<y:FreeNodePortLocationModelParameter Ratio="0,0.5"/>
+					<y:FreeNodePortLocationModelParameter Ratio="0.5,0"/>
 				</data>
 			</port>
 		</node>
-		<edge id="e0" source="n0" target="n1" sourceport="p0" targetport="p0">
+		<edge id="e0" source="n1" target="n2" sourceport="p0" targetport="p0">
 			<data key="d12">
-				<yjs:PolylineEdgeStyle stroke="{y:GraphMLReference 3}">
-					<yjs:PolylineEdgeStyle.sourceArrow>
-						<yjs:Arrow type="TRIANGLE" stroke="{y:GraphMLReference 3}" fill="#FFFFFFFF"/>
-					</yjs:PolylineEdgeStyle.sourceArrow>
+				<yjs:PolylineEdgeStyle stroke="{y:GraphMLReference 5}">
+					<yjs:PolylineEdgeStyle.targetArrow>
+						<yjs:Arrow stroke="{y:GraphMLReference 5}" fill="#FF000000"/>
+					</yjs:PolylineEdgeStyle.targetArrow>
 				</yjs:PolylineEdgeStyle>
 			</data>
 		</edge>
-		<edge id="e1" source="n4" target="n0" sourceport="p0" targetport="p1">
+		<edge id="e1" source="n3" target="n0" sourceport="p0" targetport="p0">
 			<data key="d12">
-				<y:GraphMLReference ResourceKey="5"/>
+				<y:GraphMLReference ResourceKey="7"/>
 			</data>
 		</edge>
-		<edge id="e2" source="n6" target="n5" sourceport="p0" targetport="p0">
+		<edge id="e2" source="n0" target="n1" sourceport="p1" targetport="p1">
 			<data key="d12">
-				<y:GraphMLReference ResourceKey="5"/>
+				<y:GraphMLReference ResourceKey="7"/>
 			</data>
 		</edge>
-		<edge id="e3" source="n5" target="n1" sourceport="p1" targetport="p1">
+		<edge id="e3" source="n4" target="n3" sourceport="p0" targetport="p1">
 			<data key="d12">
-				<y:GraphMLReference ResourceKey="5"/>
+				<y:GraphMLReference ResourceKey="7"/>
 			</data>
 		</edge>
-		<edge id="e4" source="n1" target="n2" sourceport="p2" targetport="p0">
+		<edge id="e4" source="n4" target="n5" sourceport="p1" targetport="p0">
 			<data key="d12">
-				<y:GraphMLReference ResourceKey="5"/>
+				<y:GraphMLReference ResourceKey="9"/>
 			</data>
 		</edge>
-		<edge id="e5" source="n2" target="n3" sourceport="p1" targetport="p0">
+		<edge id="e5" source="n6" target="n7" sourceport="p0" targetport="p0">
 			<data key="d12">
-				<y:GraphMLReference ResourceKey="5"/>
+				<y:GraphMLReference ResourceKey="9"/>
+			</data>
+		</edge>
+		<edge id="e6" source="n5" target="n6" sourceport="p1" targetport="p1">
+			<data key="d12">
+				<y:GraphMLReference ResourceKey="7"/>
 			</data>
 		</edge>
 	</graph>

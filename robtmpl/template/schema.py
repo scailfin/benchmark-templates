@@ -6,9 +6,9 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
-"""Definition of schema components for benchmark result schemas. The schema
-definition is part of the extended workflow template specification that is used
-to define benchmarks.
+"""Definition of schema components for benchmark results. The schema definition
+is part of the extended workflow template specification that is used to define
+benchmarks.
 """
 
 import robtmpl.template.parameter.declaration as pd
@@ -34,6 +34,7 @@ SCHEMA_LABELS = [LABEL_RESULT_FILE, LABEL_SCHEMA]
 """Column sort orders."""
 SORT_ASC = 'ASC'
 SORT_DESC = 'DESC'
+
 
 class BenchmarkResultColumn(object):
     """Column in the result schema of a benchmark. Each column has a unique

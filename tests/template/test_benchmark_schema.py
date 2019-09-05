@@ -10,9 +10,8 @@
 
 import pytest
 
-import robtmpl.benchmark.schema as schema
-
 import robtmpl.template.parameter.declaration as pd
+import robtmpl.template.schema as schema
 
 
 class TestBenchmarkResultSchema(object):

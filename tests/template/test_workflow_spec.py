@@ -16,7 +16,7 @@ from robtmpl.template.parameter.value import TemplateArgument
 
 import robtmpl.template.parameter.util as pd
 import robtmpl.template.parameter.value as pr
-import robtmpl.template.base as tmpl
+import robtmpl.template.util as tmplutil
 
 
 class TestReplaceSpecificationParameters(object):
@@ -37,14 +37,14 @@ class TestReplaceSpecificationParameters(object):
             }
         ])
         # Test default values (no arguments)
-        wf = tmpl.replace_args(
+        wf = tmplutil.replace_args(
             spec=spec,
             parameters=parameters,
             arguments=dict()
         )
         assert wf['input'] == ['code/helloworld.py']
         # Test default values (with arguments)
-        wf = tmpl.replace_args(
+        wf = tmplutil.replace_args(
             spec=spec,
             parameters=parameters,
             arguments=pr.parse_arguments(
@@ -62,13 +62,13 @@ class TestReplaceSpecificationParameters(object):
             }
         ])
         # Test default values (no arguments)
-        wf = tmpl.replace_args(
+        wf = tmplutil.replace_args(
             spec=spec,
             parameters=parameters,
             arguments=dict()
         )
         assert wf['input'] == ['src/helloworld.py']
-        wf = tmpl.replace_args(
+        wf = tmplutil.replace_args(
             spec=spec,
             parameters=parameters,
             arguments=pr.parse_arguments(
@@ -93,14 +93,14 @@ class TestReplaceSpecificationParameters(object):
             }
         ])
         # Test default values (no arguments)
-        wf = tmpl.replace_args(
+        wf = tmplutil.replace_args(
             spec=spec,
             parameters=parameters,
             arguments=dict()
         )
         assert wf['parameters'] == {'sleeptime': 10}
         # Test default values (with arguments)
-        wf = tmpl.replace_args(
+        wf = tmplutil.replace_args(
             spec=spec,
             parameters=parameters,
             arguments=pr.parse_arguments(

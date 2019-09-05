@@ -5,12 +5,3 @@
 #
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
-
-include LICENSE
-include *.rst
-include resources/db/benchrepo.sql
-recursive-include robtmpl *.py
-prune docs/_build
-recursive-include docs *.py
-recursive-include docs *.rst
-global-exclude *.py[co]

@@ -1,20 +1,12 @@
-==================================================
-Repositories for Workflow Templates and Benchmarks
-==================================================
+===================================
+Repositories for Workflow Templates
+===================================
 
-The package contains implementations for repositories to maintain workflow templates and extended benchmark templates. Most of the relevant information is stored in separate directories and files on the file system. The **Benchmark Repository** in addition maintains some information in a relational database.
-
-The UML diagram for the relevant classes is shown below:
-
-.. figure:: figures/repository.png
-   :scale: 50 %
-   :alt: UML Diagram for Repositories
-
-UML Diagram of classes that are relevant for workflow template and benchmark repositories.
+The package contains a default implementation for a repository to maintain workflow templates and extended benchmark templates. The repository stores most of the relevant information in separate directories and files on the file system. In addition, some information is maintained in a relational database.
 
 
-Template Repositories
-=====================
+Directory Structure
+===================
 
 The **Template Repository** is used to maintain copies of workflow templates in a uniform way. All templates are maintained as files on the file system under a base directory. The respective directory structure is as follows:
 
@@ -33,6 +25,9 @@ When the template is added to the repository, either a source directory on the f
 
 .. line-block::
 
+    benchmark.yml
+    benchmark.yaml
+    benchmark.json
     template.yml
     template.yaml
     template.json
@@ -40,41 +35,21 @@ When the template is added to the repository, either a source directory on the f
     workflow.yaml
     workflow.json
 
-The first matching file is expected to contain the template specification. The suffix determines the expected file format (``.yml`` and ``.yaml`` for files in Yaml format and ``'json`` for Json format). If a specification file is found, the content is stored as ``repository.json`` in the template folder. All files in the source directory are then (recursively) copied to the ``static`` folder.
-
-
-
-Benchmark Repository
-====================
-
-The **Benchmark Repository** extends the **Template Repository** in several ways.
-
-
-Default Specification File
---------------------------
-
-In addition to the default file names listed above, the **Benchmark Repository** first checks the following three files when searching for the benchmark specification (in the given order).
-.. line-block::
-
-    benchmark.yml
-    benchmark.yaml
-    benchmark.json
-
-Only if none of these files exist in the source directory default names for workflow templates are checked.
+The first matching file is expected to contain the template specification. The suffix determines the expected file format (``.yml`` and ``.yaml`` for files in Yaml format and ``'json`` for Json format). If a specification file is found, the content is stored as ``repository.json`` in the template folder. All files in the source directory are (recursively) copied to the ``static`` folder.
 
 
 Database
---------
+========
 
-The **Benchmark Repository** maintains additional information about benchmarks and benchmark runs in a relational database. The database schema has two tables **benchmark** and **benchmark_runs**:
+The **Template Repository** maintains additional information about templates and benchmark runs in a relational database. The database schema has two tables **benchmark** and **benchmark_runs**:
 
 .. code-block:: sql
 
     --
-    -- Each benchmark has a unique identifier and name, a short descriptor and a
+    -- Each template has a unique identifier and name, a short descriptor and a
     -- set of instructions.
     --
-    CREATE TABLE benchmark(
+    CREATE TABLE template(
         id CHAR(32) NOT NULL,
         name VARCHAR(255) NOT NULL,
         description TEXT,
@@ -84,12 +59,12 @@ The **Benchmark Repository** maintains additional information about benchmarks a
     );
 
     --
-    -- For each benchmark run the run state is maintained as well as timestamps for
-    -- different stages of the executed workflow.
+    -- For each benchmark run the run state is maintained as well as timestamps
+    -- for different stages of the executed workflow.
     --
     CREATE TABLE benchmark_run(
         id CHAR(32) NOT NULL,
-        benchmark CHAR(32) NOT NULL REFERENCES benchmark(id),
+        template CHAR(32) NOT NULL REFERENCES benchmark(id),
         state VARCHAR(8) NOT NULL,
         created_at CHAR(26) NOT NULL,
         started_at CHAR(26),
@@ -98,8 +73,20 @@ The **Benchmark Repository** maintains additional information about benchmarks a
     );
 
 
-For each benchmark the unique identifier (same as the template identifier) and name are maintained, together with an optional short description and a list of instructions for participants. The benchmark name is used as the human-readable identifier and is therefore expected to be unique.
+For each template the unique identifier and name are maintained, together with an optional short description and a list of instructions for participants. The template name is used as the human-readable identifier and is therefore expected to be unique.
 
-Each benchmark runs has a unique identifier and references the respective benchmark template. For benchmark runs various timestamps are maintained (all in UTC time). The ``created_at`` timestamp denotes the time when the run was submitted. The ``started_at`` timestamp is the time when the corresponding workflow engine backend started the execution of the run. The ``ended_at`` timestamp denotes the time when the workflow terminated. Depending on the ``state`` this timestamp may either be the time of successful completion or the occurrence of an error or an event that canceled workflow execution.
+Each benchmark runs has a unique identifier and references the respective template. For benchmark runs various timestamps are maintained (all in UTC time). The ``created_at`` timestamp denotes the time when the run was submitted. The ``started_at`` timestamp is the time when the corresponding workflow engine started the execution of the run. The ``ended_at`` timestamp denotes the time when the workflow terminated. Depending on the ``state``, this timestamp may either be the time of successful completion or the occurrence of an error or an event that canceled workflow execution.
 
 By default, SQLite is used as the database management system. The default database file is ``repo.db`` in the base directory of the repository.
+
+
+UML Diagram
+===========
+
+The UML diagram for the relevant classes is shown below:
+
+.. figure:: figures/repository.png
+   :scale: 50 %
+   :alt: UML Diagram for Repositories
+
+UML Diagram of classes that are relevant for workflow template and benchmark repositories.

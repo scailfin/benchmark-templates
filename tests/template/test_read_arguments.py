@@ -12,7 +12,7 @@ import pytest
 
 from robtmpl.core.io.scanner import Scanner, ListReader
 from robtmpl.template.parameter.base import TemplateParameter, AS_INPUT
-from robtmpl.template.base import TemplateHandle
+from robtmpl.template.base import WorkflowTemplate
 
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.parameter.util as tmpl
@@ -23,7 +23,7 @@ class TestReadTemplateArguments(object):
         """Read argument for a template that contains a parameter of data type
         DT_RECORD.
         """
-        template = TemplateHandle(
+        template = WorkflowTemplate(
             workflow_spec=dict(),
             parameters=[
                 TemplateParameter(

@@ -2,8 +2,9 @@ workflow:
     version: 0.3.0
     inputs:
       files:
-        - $[[code]]
-        - $[[names]]
+        - code/helloworld.py
+        - $[[sleeptime]]
+        - $[[noparameter]]
       parameters:
         helloworld: code/helloworld.py
         inputfile: $[[names]]
@@ -30,24 +31,15 @@ parameters:
     - id: names
       name: 'Input file'
       datatype: file
-      as: data/names.txt
+      as: data/persons.txt
+    - id: friends
+      name: 'Default example'
+      datatype: file
+      as: data/friends.txt
+      defaultValue: inputs/names.txt
     - id: sleeptime
       datatype: int
       defaultValue: 10
     - id: waittime
       datatype: int
       defaultValue: 5
-results:
-    file: results/analytics.json
-    schema:
-        - id: col1
-          name: 'Column 1'
-          type: int
-        - id: col2
-          name: 'Column 2'
-          type: decimal
-          required: false
-        - id: col3
-          name: 'Column 3'
-          type: string
-          required: true

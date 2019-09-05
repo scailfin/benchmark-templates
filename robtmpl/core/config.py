@@ -29,6 +29,10 @@ ROB_DB_ID = 'ROB_DBMS'
 ROB_TEST = 'ROB_TEST'
 
 
+"""Default name of the database file."""
+DEFAULT_DATABASE = 'repo.db'
+
+
 # -- Public helper methofd to access configuration values ----------------------
 
 def DB_CONNECT(default_value=None, raise_error=False):

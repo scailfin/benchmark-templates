@@ -12,13 +12,15 @@ import os
 import pytest
 import shutil
 
-from robtmpl.workflow.io import FileCopy
+from robtmpl.core.db.driver import DatabaseDriver
 from robtmpl.core.io.files.base import FileHandle
+from robtmpl.repo.benchmark import BenchmarkRepository
 from robtmpl.template.parameter.value import TemplateArgument
-from robtmpl.template.base import TemplateHandle
-from robtmpl.template.repo import TemplateRepository
+from robtmpl.workflow.io import FileCopy
 
+import robtmpl.core.config as config
 import robtmpl.core.error as err
+import robtmpl.core.db.driver as driver
 import robtmpl.workflow.io as backend
 
 
@@ -30,7 +32,7 @@ SCRIPT_FILE = os.path.join(DIR, '../.files/workflows/helloworld/code/script.txt'
 WORKFLOW_DIR = os.path.join(DIR, '../.files/template')
 
 SPEC_FILE = os.path.join(WORKFLOW_DIR, 'alt-template.yaml')
-SPEC_FILE_ERR = os.path.join(WORKFLOW_DIR, 'alt-error.yaml')
+SPEC_FILE_ERR = os.path.join(WORKFLOW_DIR, 'alt-upload-error.yaml')
 
 
 class TestFileCopy(object):
@@ -69,18 +71,28 @@ class TestFileCopy(object):
 
     def test_prepare_inputs_for_local_run(self, tmpdir):
         """Test copying input files for a local workflow run."""
-        # Load template
-        store = TemplateRepository(base_dir=str(tmpdir))
-        template = store.add_template(
+        # Initialize the database and repository
+        connect_string = '{}/{}'.format(str(tmpdir), config.DEFAULT_DATABASE)
+        dbms_id = driver.SQLITE[0]
+        DatabaseDriver.init_db(dbms_id=dbms_id, connect_string=connect_string)
+        con = DatabaseDriver.get_connector(
+            dbms_id=dbms_id,
+            connect_string=connect_string
+        ).connect()
+        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        # Load first template
+        template = repo.add_template(
+            name='My Template',
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE
-        )
+        ).get_workflow_template()
         # Create run directory
         run_dir = os.path.join(str(tmpdir), 'run')
         os.makedirs(run_dir)
         # Copy input files to run directory
         backend.upload_files(
             template=template,
+            base_dir=repo.get_static_dir(template.identifier),
             files=template.workflow_spec.get('inputs', {}).get('files', []),
             arguments={
                 'names': TemplateArgument(
@@ -119,20 +131,23 @@ class TestFileCopy(object):
         with pytest.raises(err.MissingArgumentError):
             backend.upload_files(
                 template=template,
+                base_dir=repo.get_static_dir(template.identifier),
                 files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={},
                 loader=FileCopy(run_dir)
             )
         # Error when copying non-existing file
-        template = store.add_template(
+        template = repo.add_template(
+            name='Second Template',
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE
-        )
+        ).get_workflow_template()
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
         with pytest.raises(IOError):
             backend.upload_files(
                 template=template,
+                base_dir=repo.get_static_dir(template.identifier),
                 files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={
                     'names': TemplateArgument(
@@ -151,6 +166,7 @@ class TestFileCopy(object):
         os.makedirs(run_dir)
         backend.upload_files(
             template=template,
+            base_dir=repo.get_static_dir(template.identifier),
             files=template.workflow_spec.get('inputs', {}).get('files', []),
             arguments={
                 'names': TemplateArgument(
@@ -169,16 +185,18 @@ class TestFileCopy(object):
         assert not os.path.isfile(os.path.join(run_dir, 'data', 'persons.txt'))
         assert os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt'))
         # Template with input file parameter that is not of type file
-        template = store.add_template(
+        template = repo.add_template(
+            name='Third Template',
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE_ERR
-        )
+        ).get_workflow_template()
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
         # Copy input files to run directory
         with pytest.raises(err.InvalidTemplateError):
             backend.upload_files(
                 template=template,
+                base_dir=repo.get_static_dir(template.identifier),
                 files=template.workflow_spec.get('inputs', {}).get('files', []),
                 arguments={
                     'sleeptime': TemplateArgument(

@@ -18,7 +18,7 @@ from robtmpl.core.io.files.base import FileHandle, InputFile
 from robtmpl.template.parameter.value import TemplateArgument
 
 import robtmpl.core.error as err
-import robtmpl.template.base as tmpl
+import robtmpl.template.util as tmpl
 
 
 # -- Helper Classes ------------------------------------------------------------
@@ -70,7 +70,7 @@ class FileCopy(object):
 
 # -- Helper Methods ------------------------------------------------------------
 
-def upload_files(template, files, arguments, loader):
+def upload_files(template, base_dir, files, arguments, loader):
     """Upload all references to local files in a given list of file names of
     parameter references. THe list of files, for example corresponds to the
     entries in the 'inputs.files' section of a REANA workflow specification.
@@ -83,9 +83,12 @@ def upload_files(template, files, arguments, loader):
 
     Parameters
     ----------
-    template: robtmpl.template.base.TemplateHandle
+    template: robtmpl.template.base.WorkflowTemplate
         Workflow template containing the parameterized specification and the
         parameter declarations
+    base_dir: string
+        Path to the base directory of the template folder containing static
+        template files
     files: list(string)
         List of file references
     arguments: dict(robtmpl.template.parameter.value.TemplateArgument)
@@ -127,7 +130,7 @@ def upload_files(template, files, arguments, loader):
                         value=InputFile(
                             f_handle=FileHandle(
                                 filepath=os.path.join(
-                                    template.base_dir,
+                                    base_dir,
                                     para.default_value
                                 )
                             ),
@@ -139,7 +142,7 @@ def upload_files(template, files, arguments, loader):
             source = arg.value.source()
             target = arg.value.target()
         else:
-            source = os.path.join(template.base_dir, val)
+            source = os.path.join(base_dir, val)
             target = val
         # Upload source file
         loader(source, target)

@@ -79,15 +79,15 @@ class PostgresConnector(DatabaseConnector):
         """
         return indent + 'postgres {} on {}'.format(self.database, self.host)
 
-    def init_db(self, schema_file=None):
-        """Initialize the database by executing a given SQL script to create
-        a clean initial version of the database tables and views.
+    def execute(self, schema_file):
+        """Executing a given SQL script.
 
         Parameters
         ----------
         schema_file: string
-            Path to the file containing the statements to create database tables
+            Path to the file containing the DML or DDL statements
         """
         with self.connect() as con:
             with open(schema_file) as f:
                 con.cursor().execute(f.read())
+            con.commit()

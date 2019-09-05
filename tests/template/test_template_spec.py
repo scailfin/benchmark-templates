@@ -6,7 +6,7 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
-"""Test TemplateHandle functionality."""
+"""Test functionality of the template base module."""
 
 import os
 import pytest
@@ -15,43 +15,26 @@ from robtmpl.core.io.files.base import FileHandle
 from robtmpl.template.parameter.base import TemplateParameter
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.workflow.resource.base import ResourceDescriptor, LABEL_ID
-from robtmpl.template.base import TemplateHandle
-from robtmpl.template.loader import DefaultTemplateLoader
+from robtmpl.template.base import WorkflowTemplate
 
 import robtmpl.core.error as err
+import robtmpl.core.util as util
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.base as tmpl
-import robtmpl.template.loader as loader
+import robtmpl.template.util as tmplutil
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
 TEMPLATE_JSON_FILE = os.path.join(DIR, '../.files/template/template.json')
 TEMPLATE_YAML_FILE = os.path.join(DIR, '../.files/template/template.yaml')
-TEMPLATE_ERR = os.path.join(DIR, '../.files/template-error-2.yaml')
 
 
-class TestTemplateHandle(object):
-    def test_duplicate_id(self):
-        """Ensure that exception is raised if parameter identifier are not
-        unique.
-        """
-        with pytest.raises(err.InvalidTemplateError):
-            DefaultTemplateLoader().from_dict({
-                    loader.LABEL_WORKFLOW: dict(),
-                    loader.LABEL_PARAMETERS: [
-                        pd.parameter_declaration('A', index=1),
-                        pd.parameter_declaration('B'),
-                        pd.parameter_declaration('C'),
-                        pd.parameter_declaration('A', index=2),
-                        pd.parameter_declaration('E', index=1)
-                    ]
-                },
-                validate=True
-            )
-
+class TestWorkflowTemplate(object):
+    """Unit tests for classes and methods in the template base module."""
     def test_get_parameter_references(self):
         """Test function to get all parameter references in a workflow
-        specification."""
+        specification.
+        """
         spec = {
             'input': [
                 'A',
@@ -62,52 +45,46 @@ class TestTemplateHandle(object):
             'F': '$[[U]]',
             'G': ['$[[V]]', 123]
         }
-        refs = tmpl.get_parameter_references(spec)
+        refs = tmplutil.get_parameter_references(spec)
         assert refs == set(['U', 'V', 'W', 'X', 'Y', 'Z'])
         # If given parameter set as argument the elements in that set are part
         # of the result
         para = set(['A', 'B', 'X'])
-        refs = tmpl.get_parameter_references(spec, parameters=para)
+        refs = tmplutil.get_parameter_references(spec, parameters=para)
         assert refs == set(['A', 'B', 'U', 'V', 'W', 'X', 'Y', 'Z'])
         # Error if specification contains nested lists
         with pytest.raises(err.InvalidTemplateError):
-            tmpl.get_parameter_references({
+            tmplutil.get_parameter_references({
                 'input': [
                     'A',
                     ['$[[X]]'],
                     {'B': {'C': '$[[Y]]', 'D': [123, '$[[Z]]']}}
                 ]
             })
-        # Error when loading specification that references undefined parameter
-        with pytest.raises(err.UnknownParameterError):
-            template = DefaultTemplateLoader().load(TEMPLATE_ERR, validate=True)
 
     def test_init(self):
-        """Test initialization of attribuets and error cases when creating
+        """Test initialization of attributes and error cases when creating
         template instances.
         """
-        th = TemplateHandle(
+        template = WorkflowTemplate(
             workflow_spec=dict(),
             parameters=[
                 TemplateParameter(pd.parameter_declaration('A')),
                 TemplateParameter(pd.parameter_declaration('B'))
             ]
         )
-        assert not th.identifier is None
-        assert th.base_dir is None
-        th = TemplateHandle(
+        assert not template.identifier is None
+        template = WorkflowTemplate(
             identifier='ABC',
-            base_dir='XYZ',
             workflow_spec=dict(),
             parameters=[
                 TemplateParameter(pd.parameter_declaration('A')),
                 TemplateParameter(pd.parameter_declaration('B'))
             ]
         )
-        assert th.identifier == 'ABC'
-        assert th.base_dir == 'XYZ'
+        assert template.identifier == 'ABC'
         with pytest.raises(err.InvalidTemplateError):
-            TemplateHandle(
+            WorkflowTemplate(
                 workflow_spec=dict(),
                 parameters=[
                     TemplateParameter(pd.parameter_declaration('A')),
@@ -118,11 +95,11 @@ class TestTemplateHandle(object):
 
     def test_nested_parameters(self):
         """Test proper nesting of parameters for DT_LIST and DT_RECORD."""
-        # Create a new TemplateHandle with an empty workflow specification and
+        # Create a new WorkflowTemplate with an empty workflow specification and
         # a list of six parameters (one record and one list)
-        template = DefaultTemplateLoader().from_dict({
-                loader.LABEL_WORKFLOW: dict(),
-                loader.LABEL_PARAMETERS: [
+        template = WorkflowTemplate.from_dict({
+                tmpl.LABEL_WORKFLOW: dict(),
+                tmpl.LABEL_PARAMETERS: [
                     pd.parameter_declaration('A'),
                     pd.parameter_declaration('B', data_type=pd.DT_RECORD),
                     pd.parameter_declaration('C', parent='B'),
@@ -148,39 +125,11 @@ class TestTemplateHandle(object):
         assert len(e.children) == 1
         assert 'F' in [p.identifier for p in e.children]
 
-    def test_serialization(self):
-        """Test serialization of workflow templates."""
-        template = TemplateHandle(
-            identifier='ABC',
-            base_dir='XYZ',
-            workflow_spec=dict(),
-            parameters=[
-                TemplateParameter(pd.parameter_declaration('A')),
-                TemplateParameter(pd.parameter_declaration('B', data_type=pd.DT_LIST)),
-                TemplateParameter(pd.parameter_declaration('C', parent='B'))
-            ]
-        )
-        doc = DefaultTemplateLoader().to_dict(template)
-        parameters = DefaultTemplateLoader().from_dict(doc).parameters
-        assert len(parameters) == 3
-        assert 'A' in parameters
-        assert 'B' in parameters
-        assert len(parameters['B'].children) == 1
-        template = DefaultTemplateLoader().from_dict(doc)
-        assert template.identifier == 'ABC'
-        # The base directory is not materialized
-        assert template.base_dir is None
-        # Invalid resource descriptor serializations
-        with pytest.raises(err.InvalidTemplateError):
-            ResourceDescriptor.from_dict(dict())
-        with pytest.raises(err.InvalidTemplateError):
-            ResourceDescriptor.from_dict({LABEL_ID: 'A', 'noname': 'B'})
-
     def test_simple_replace(self):
         """Replace parameter references in simple template with argument values.
         """
         for filename in [TEMPLATE_YAML_FILE, TEMPLATE_JSON_FILE]:
-            template = DefaultTemplateLoader().load(filename)
+            template = WorkflowTemplate.from_dict(util.read_object(filename))
             arguments = {
                 'code': TemplateArgument(
                     parameter=template.get_parameter('code'),
@@ -195,7 +144,7 @@ class TestTemplateHandle(object):
                     value=10
                 )
             }
-            spec = tmpl.replace_args(
+            spec = tmplutil.replace_args(
                 spec=template.workflow_spec,
                 arguments=arguments,
                 parameters=template.parameters
@@ -210,11 +159,11 @@ class TestTemplateHandle(object):
     def test_sort(self):
         """Test the sort functionality of the template list_parameters method.
         """
-        # Create a new TemplateHandle with an empty workflow specification and
+        # Create a new WorkflowTemplate with an empty workflow specification and
         # a list of five parameters
-        template = DefaultTemplateLoader().from_dict({
-                loader.LABEL_WORKFLOW: dict(),
-                loader.LABEL_PARAMETERS: [
+        template = WorkflowTemplate.from_dict({
+                tmpl.LABEL_WORKFLOW: dict(),
+                tmpl.LABEL_PARAMETERS: [
                     pd.parameter_declaration('A', index=1),
                     pd.parameter_declaration('B'),
                     pd.parameter_declaration('C'),

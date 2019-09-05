@@ -49,13 +49,12 @@ class DatabaseConnector(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_db(self, schema_file):
-        """Initialize the database by executing a given SQL script to create
-        a clean initial version of the database tables and views.
+    def execute(self, schema_file):
+        """Executing a given SQL script.
 
         Parameters
         ----------
         schema_file: string
-            Path to the file containing the statements to create database tables
+            Path to the file containing the DML or DDL statements
         """
         raise NotImplementedError()
