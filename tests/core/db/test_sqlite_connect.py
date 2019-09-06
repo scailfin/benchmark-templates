@@ -18,7 +18,7 @@ import robtmpl.core.db.driver as driver
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
-DML_FILE = os.path.join(DIR, '../../../.files/db/testdb.sql')
+DML_FILE = os.path.join(DIR, '../../.files/db/testdb.sql')
 
 
 class TestSQLiteConnector(object):

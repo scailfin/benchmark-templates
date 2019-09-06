@@ -41,9 +41,6 @@ setup(
     author_email='heiko.muller@gmail.com',
     license='MIT',
     packages=find_packages(exclude=('tests',)),
-    data_files=[
-        ('sql', ['resources/db/benchrepo.sql'])
-    ],
     include_package_data=True,
     extras_require=extras_require,
     tests_require=tests_require,

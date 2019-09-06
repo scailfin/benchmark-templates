@@ -116,12 +116,15 @@ class DatabaseDriver(object):
         # Add names of files here if they contain statements to be executed
         # when the database is initialized. Files are executed in the order
         # of the list.
-        scripts = ['../resources/db/benchrepo.sql']
+        scripts = ['core/db/install/benchrepo.sql']
         # Get a database connector
         db = DatabaseDriver.get_connector(
             dbms_id=dbms_id,
             connect_string=connect_string
         )
+        # Assumes that all script files are distributed as part of the current
+        # package
+        pkg_name = __package__.split('.')[0]
         # Execute the database scripts
         for script_file in scripts:
-            db.execute(pkg_resources.resource_filename('robtmpl', script_file))
+            db.execute(pkg_resources.resource_filename(pkg_name, script_file))

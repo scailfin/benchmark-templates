@@ -1,4 +1,3 @@
--- -----------------------------------------------------------------------------
 -- This file is part of the Reproducible Open Benchmarks for Data Analysis
 -- Platform (ROB).
 --
@@ -6,14 +5,13 @@
 --
 -- ROB is free software; you can redistribute it and/or modify it under the
 -- terms of the MIT License; see LICENSE file for more details.
--- -----------------------------------------------------------------------------
+
 
 -- -----------------------------------------------------------------------------
 -- This file defines the database schema for the benchmark repository. The
 -- repository maintains basic information about registered benchmarks as well
 -- as status information for benchmark runs.
 -- -----------------------------------------------------------------------------
-
 
 --
 -- Drop all tables (if they exist)

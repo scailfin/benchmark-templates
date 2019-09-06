@@ -11,6 +11,8 @@ workflow template parameters. The class is a simple wrapper that combines
 the value and the meta-data in the parameter declaration.
 """
 
+from past.builtins import basestring
+
 from robtmpl.core.io.files.base import FileHandle, InputFile
 from robtmpl.template.parameter.base import ParameterBase
 
@@ -88,7 +90,7 @@ class TemplateArgument(ParameterBase):
             if not isinstance(self.value, int):
                 raise ValueError('expected int for \'{}\''.format(self.identifier))
         elif self.is_string():
-            if not isinstance(self.value, str):
+            if not isinstance(self.value, basestring):
                 raise ValueError('expected string for \'{}\''.format(self.identifier))
         elif self.is_file():
             # Expects a file handle
