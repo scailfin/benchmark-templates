@@ -13,7 +13,7 @@ import pytest
 
 from robtmpl.core.db.driver import DatabaseDriver as DB
 
-import robtmpl.core.config as config
+import robtmpl.config.base as config
 
 
 class TestDatabaseDriver(object):

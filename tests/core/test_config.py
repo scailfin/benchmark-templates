@@ -13,7 +13,7 @@ variables.
 import os
 import pytest
 
-import robtmpl.core.config as config
+import robtmpl.config.base as config
 import robtmpl.core.error as err
 
 

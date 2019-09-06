@@ -11,9 +11,10 @@
 import os
 import pytest
 
+from robtmpl.config.install import DB
 from robtmpl.core.db.driver import DatabaseDriver
 
-import robtmpl.core.config as config
+import robtmpl.config.base as config
 import robtmpl.core.db.driver as driver
 
 
@@ -33,7 +34,7 @@ class TestSQLiteConnector(object):
         connect_string = '{}/{}'.format(str(tmpdir), config.DEFAULT_DATABASE)
         # Create a new empty database
         dbms_id = driver.SQLITE[0]
-        DatabaseDriver.init_db(dbms_id=dbms_id, connect_string=connect_string)
+        DB.init(dbms_id=dbms_id, connect_string=connect_string)
         db = DatabaseDriver.get_connector(
             dbms_id=dbms_id,
             connect_string=connect_string

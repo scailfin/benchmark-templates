@@ -12,13 +12,14 @@ import os
 import pytest
 import shutil
 
+from robtmpl.config.install import DB
 from robtmpl.core.db.driver import DatabaseDriver
 from robtmpl.core.io.files.base import FileHandle
 from robtmpl.repo.benchmark import BenchmarkRepository
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.workflow.io import FileCopy
 
-import robtmpl.core.config as config
+import robtmpl.config.base as config
 import robtmpl.core.error as err
 import robtmpl.core.db.driver as driver
 import robtmpl.workflow.io as backend
@@ -74,7 +75,7 @@ class TestFileCopy(object):
         # Initialize the database and repository
         connect_string = '{}/{}'.format(str(tmpdir), config.DEFAULT_DATABASE)
         dbms_id = driver.SQLITE[0]
-        DatabaseDriver.init_db(dbms_id=dbms_id, connect_string=connect_string)
+        DB.init(dbms_id=dbms_id, connect_string=connect_string)
         con = DatabaseDriver.get_connector(
             dbms_id=dbms_id,
             connect_string=connect_string

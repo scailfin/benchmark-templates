@@ -12,10 +12,11 @@ import os
 import pytest
 import sqlite3
 
+from robtmpl.config.install import DB
 from robtmpl.core.db.driver import DatabaseDriver
 from robtmpl.repo.benchmark import BenchmarkRepository
 
-import robtmpl.core.config as config
+import robtmpl.config.base as config
 import robtmpl.core.error as err
 import robtmpl.core.db.driver as driver
 import robtmpl.repo.benchmark as bmark
@@ -48,7 +49,7 @@ class TestBenchmarkRepository(object):
         connect_string = '{}/{}'.format(str(base_dir), config.DEFAULT_DATABASE)
         # Create a new empty database
         dbms_id = driver.SQLITE[0]
-        DatabaseDriver.init_db(dbms_id=dbms_id, connect_string=connect_string)
+        DB.init(dbms_id=dbms_id, connect_string=connect_string)
         db = DatabaseDriver.get_connector(
             dbms_id=dbms_id,
             connect_string=connect_string
