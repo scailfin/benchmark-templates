@@ -14,12 +14,11 @@ import sqlite3
 
 from robtmpl.config.install import DB
 from robtmpl.core.db.driver import DatabaseDriver
-from robtmpl.repo.benchmark import BenchmarkRepository
+from robtmpl.template.repo.fs import TemplateFSRepository
 
 import robtmpl.config.base as config
 import robtmpl.core.error as err
 import robtmpl.core.db.driver as driver
-import robtmpl.repo.benchmark as bmark
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))
@@ -41,7 +40,7 @@ class DummyIDFunc():
 
 # base_dir, con=None, store=None, default_filenames=None
 
-class TestBenchmarkRepository(object):
+class TestTemplateFSRepository(object):
     """Test functionality of the default benchmark repository."""
     def init_db(self, base_dir):
         """Initialize the database and return an open connection."""
@@ -63,7 +62,7 @@ class TestBenchmarkRepository(object):
     def test_add_template(self, tmpdir):
         """Test creating templates."""
         con = self.init_db(base_dir=str(tmpdir))
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         template = repo.add_template(name='My Template', src_dir=TEMPLATE_DIR)
         # Validate the template handle
         assert not template.identifier is None
@@ -76,20 +75,8 @@ class TestBenchmarkRepository(object):
         template_dir = repo.get_static_dir(template.identifier)
         assert os.path.isfile(os.path.join(template_dir, 'code/helloworld.py'))
         assert os.path.isfile(os.path.join(template_dir, 'inputs/names.txt'))
-        # Ensure that the result table is created
-        res_table = bmark.PREFIX_RESULT_TABLE + template.identifier
-        sql = "INSERT INTO {}(run_id, col1, col2, col3) VALUES('A', 0, 1.2, 'A')"
-        con.execute(sql.format(res_table))
-        sql = "INSERT INTO {}(run_id, col1, col3) VALUES('B', 0, 'A')"
-        con.execute(sql.format(res_table))
-        con.commit()
-        with pytest.raises(sqlite3.IntegrityError):
-            sql = "INSERT INTO {}(run_id, col3) VALUES('C', 'A')"
-            con.execute(sql.format(res_table))
-        rs = con.execute('SELECT * FROM {}'.format(res_table)).fetchall()
-        assert len(rs) == 2
         # Force error by overriding the list of default file names
-        repo = BenchmarkRepository(
+        repo = TemplateFSRepository(
             base_dir=str(tmpdir),
             con=con,
             store=repo.store,
@@ -115,7 +102,7 @@ class TestBenchmarkRepository(object):
     def test_delete_template(self, tmpdir):
         """Test deleting templates."""
         con = self.init_db(base_dir=str(tmpdir))
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         template1 = repo.add_template(name='Template 1', src_dir=TEMPLATE_DIR)
         template2 = repo.add_template(name='Template 2', src_dir=TEMPLATE_DIR)
         assert len(repo.list_templates()) == 2
@@ -126,14 +113,14 @@ class TestBenchmarkRepository(object):
         assert template2.identifier == templates[0].identifier
         assert repo.delete_template(template2.identifier)
         assert len(repo.list_templates()) == 0
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         assert len(repo.list_templates()) == 0
 
     def test_error_for_id_func(self, tmpdir):
         """Error when the id function cannot return unique folder identifier."""
         dummy_func = DummyIDFunc()
         con = self.init_db(base_dir=str(tmpdir))
-        repo = BenchmarkRepository(base_dir=str(tmpdir), id_func=dummy_func)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), id_func=dummy_func)
         repo.add_template(name='Template 1', src_dir=TEMPLATE_DIR)
         with pytest.raises(RuntimeError):
             repo.add_template(name='Template 2', src_dir=TEMPLATE_DIR)
@@ -142,7 +129,7 @@ class TestBenchmarkRepository(object):
     def test_get_template(self, tmpdir):
         """Test adding and retrieving templates."""
         con = self.init_db(base_dir=str(tmpdir))
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         template = repo.add_template(name='My Template', src_dir=TEMPLATE_DIR)
         assert template.name == 'My Template'
         assert template.has_schema()
@@ -157,7 +144,7 @@ class TestBenchmarkRepository(object):
         assert wftmpl.workflow_spec['inputs']['files'] == ['$[[code]]', '$[[names]]']
         assert len(wftmpl.parameters) == 4
         # Re-instantiate repository, retrieve template and re-verify
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         template = repo.get_template(template.identifier)
         assert template.name == 'My Template'
         assert template.has_schema()
@@ -175,7 +162,7 @@ class TestBenchmarkRepository(object):
     def test_list_templates(self, tmpdir):
         """Test creating and listing templates."""
         con = self.init_db(base_dir=str(tmpdir))
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         template1 = repo.add_template(name='Template 1', src_dir=TEMPLATE_DIR)
         template2 = repo.add_template(name='Template 2', src_dir=TEMPLATE_DIR)
         with pytest.raises(err.ROBError):
@@ -188,7 +175,7 @@ class TestBenchmarkRepository(object):
         assert template1.identifier in ids
         assert template2.identifier in ids
         # Re-instantiate the repository
-        repo = BenchmarkRepository(base_dir=str(tmpdir), store=repo.store)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), store=repo.store)
         templates = repo.list_templates()
         assert len(templates) == 2
         ids = [t.identifier for t in templates]

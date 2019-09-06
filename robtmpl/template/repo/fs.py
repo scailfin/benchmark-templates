@@ -6,10 +6,9 @@
 # ROB is free software; you can redistribute it and/or modify it under the
 # terms of the MIT License; see LICENSE file for more details.
 
-"""The benchmark repository maintains information about benchmarks as well as
-the results of different benchmark runs. For each benchmark basic information is
-stored in the underlying database, together with the workflow template and the
-result files of individual workflow runs.
+"""The file system implementation of the template repository maintains
+information about templates and their static files on the file system as well
+as in a relational database.
 """
 
 import git
@@ -17,13 +16,13 @@ import os
 import shutil
 
 from robtmpl.core.db.driver import DatabaseDriver
-from robtmpl.repo.base import TemplateHandle, TemplateRepository
+from robtmpl.template.repo.base import TemplateHandle, TemplateRepository
 from robtmpl.template.base import WorkflowTemplate
 from robtmpl.template.io.json import JsonFileStore
 
 import robtmpl.core.error as err
 import robtmpl.core.util as util
-import robtmpl.repo.base as base
+import robtmpl.template.repo.base as base
 
 
 """Names for files and folders that are used to maintain template information."""
@@ -31,20 +30,10 @@ STATIC_FILES_DIR = 'static'
 TEMPLATE_FILE = 'template.json'
 
 
-"""Prefix for all benchmark result tables. The table name is a concatenation of
-the prefix and the template identifier.
-"""
-PREFIX_RESULT_TABLE = 'bm_'
-
-
-class BenchmarkRepository(TemplateRepository):
-    """The repository maintains benchmarks as well as the results of benchmark
-    runs. The repository is a wrapper around two components:
-
-    (1) the template repository to maintain workflow templates for for each
-        benchmark, and
-    (2) the database to store benchamrk informations (e.g., name, descritption)
-        and information about result files for workflow runs.
+class TemplateFSRepository(TemplateRepository):
+    """This repository maintains templates on the file system. It also uses a
+    relational database to store template information like the template name
+    and user instructions.
     """
     def __init__(
         self, base_dir, con=None, store=None, default_filenames=None,
@@ -68,7 +57,7 @@ class BenchmarkRepository(TemplateRepository):
             Maximum number of attempts to create a unique folder for a new
             workflow template
         """
-        super(BenchmarkRepository, self).__init__(
+        super(TemplateFSRepository, self).__init__(
             id_func=id_func,
             max_attempts=max_attempts
         )
@@ -101,7 +90,7 @@ class BenchmarkRepository(TemplateRepository):
         self, name, description=None, instructions=None, src_dir=None,
         src_repo_url=None, template_spec_file=None
     ):
-        """Add a benchmark to the repository. The associated workflow template
+        """Add a template to the repository. The associated workflow template
         is created in the template repository from either the given source
         directory or Git repository. The template repository will raise an
         error if neither or both arguments are given.
@@ -138,13 +127,12 @@ class BenchmarkRepository(TemplateRepository):
 
         Returns
         -------
-        benchengine.benchmark.base.BenchmarkHandle
+        robtmpl.template.repo.base.TemplateHandle
 
         Raises
         ------
-        benchengine.error.ROBError
-        benchtmpl.error.InvalidParameterError
-        benchtmpl.error.InvalidTemplateError
+        robtmpl.core.error.ROBError
+        robtmpl.core.error.InvalidTemplateError
         ValueError
         """
         # Exactly one of src_dir and src_repo_url has to be not None. If both
@@ -153,16 +141,16 @@ class BenchmarkRepository(TemplateRepository):
             raise ValueError('both \'src_dir\' and \'src_repo_url\' are missing')
         elif not src_dir is None and not src_repo_url is None:
             raise ValueError('cannot have both \'src_dir\' and \'src_repo_url\'')
-        # Ensure that the benchmark name is not empty, not longer than 255
+        # Ensure that the template name is not empty, not longer than 255
         # character and unique.
         if name is None:
-            raise err.ROBError('missing benchmark name')
+            raise err.ROBError('missing template name')
         name = name.strip()
         if name == '' or len(name) > 255:
-            raise err.ROBError('invalid benchmark name')
+            raise err.ROBError('invalid template name')
         sql = 'SELECT id FROM template WHERE name = ?'
         if not self.con.execute(sql, (name,)).fetchone() is None:
-            raise err.ROBError('benchmark exists')
+            raise err.ROBError('template exists')
         # Get unique identifier and create a new folder for the template files
         # and resources
         identifier = self.get_unique_identifier()
@@ -204,20 +192,11 @@ class BenchmarkRepository(TemplateRepository):
         if template is None:
             shutil.rmtree(template_dir)
             raise err.InvalidTemplateError('no template file found')
-        # Insert benchmark into database and return descriptor
+        # Insert template into database and return descriptor
         sql = 'INSERT INTO template'
         sql += '(id, name, description, instructions) '
         sql += 'VALUES(?, ?, ?, ?)'
         self.con.execute(sql, (identifier, name, description, instructions))
-        # If the template contains a result schema specification create the
-        # corresponding table in the database
-        if template.has_schema():
-            result_table_name = PREFIX_RESULT_TABLE + identifier
-            cols = list(['run_id  VARCHAR(32) NOT NULL'])
-            for col in template.get_schema().columns:
-                cols.append(col.sql_stmt())
-            sql = 'CREATE TABLE {}({}, PRIMARY KEY(run_id))'
-            self.con.execute(sql.format(result_table_name, ','.join(cols)))
         # Commit all changes to the database
         self.con.commit()
         # Return the template handle
@@ -243,7 +222,7 @@ class BenchmarkRepository(TemplateRepository):
         -------
         bool
         """
-        # Delete the benchmark record. The number of deleted rows is used the
+        # Delete the template record. The number of deleted rows is used the
         # generate the return value.
         sql = 'DELETE FROM template WHERE id = ?'
         cur = self.con.cursor()
@@ -289,13 +268,13 @@ class BenchmarkRepository(TemplateRepository):
 
         Returns
         -------
-        robtmpl.repo.base.TemplateHandle
+        robtmpl.template.repo.base.TemplateHandle
 
         Raises
         ------
         robtmpl.core.error.UnknownTemplateError
         """
-        # Get benchmark information from database. If the result is empty an
+        # Get template information from database. If the result is empty an
         # error is raised
         sql = 'SELECT id, name, description, instructions '
         sql += 'FROM template '
@@ -305,7 +284,7 @@ class BenchmarkRepository(TemplateRepository):
             raise err.UnknownTemplateError(identifier)
         # Get workflow template for template repository
         template = self.store.read(identifier)
-        # Return handle for benchmark
+        # Return handle for template
         return TemplateHandle(
             identifier=identifier,
             name=rs['name'],
@@ -320,7 +299,7 @@ class BenchmarkRepository(TemplateRepository):
 
         Returns
         -------
-        list(robtmpl.repo.base.TemplateHandle)
+        list(robtmpl.template.repo.base.TemplateHandle)
         """
         sql = 'SELECT id, name, description, instructions '
         sql += 'FROM template '

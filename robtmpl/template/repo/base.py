@@ -74,6 +74,67 @@ class TemplateHandle(object):
         self.template = template
         self.store = store
 
+    def get_leaderboard(self, sort_key=None, all_entries=False):
+        """Get current leaderboard for the benchmark. The result is a list of
+        leaderboard entries. Each entry contains the user and the run results.
+        If the all_entries flag is False at most one result per user is added
+        to the result.
+
+        Parameters
+        ----------
+        sort_key: string, optional
+            Use the given attribute to sort run results. If not given the schema
+            default attribute is used
+        all_entries: bool, optional
+            Include at most one entry per user in the result if False
+
+        Returns
+        -------
+        list(robtmpl.template.repo.base.BenchmarkResult)
+        """
+        # Create list of result columns for SELECT clause and get the attribute
+        # that is used to sort the result
+        cols = list()
+        sort_stmt = None
+        for col in self.template.schema.columns:
+            if col.is_default:
+                cols.insert(0, col)
+                if sort_key is None:
+                    sort_stmt = col.sort_statement()
+            else:
+                cols.append(col)
+                if not sort_key is None and col.identifier == sort_key:
+                    sort_stmt = col.sort_statement()
+        col_names = list()
+        for col in cols:
+            col_names.append('r.{}'.format(col.identifier))
+        # Use the first column as the sort column if no default is specified in
+        # the schema.
+        if sort_stmt is None:
+            sort_stmt = self.template.schema.columns[0].sort_statement()
+        # Query the database to get the ordered list or benchmark run results
+        sql = 'SELECT u.id, u.email, {} '.format(','.join(col_names))
+        sql += 'FROM registered_user u, benchmark_run b, '
+        sql += '{} r '.format(self.result_table_name)
+        sql += 'WHERE u.id = b.user_id AND b.run_id = r.run_id '
+        sql += 'ORDER BY {}'.format(sort_stmt)
+        rs = self.con.execute(sql).fetchall()
+        # Keep track of users for which we have results (only needed if the
+        # all_entries flag is False)
+        users = set()
+        leaderboard = list()
+        for row in rs:
+            user = RegisteredUser(identifier=row[0], email=row[1])
+            if user.identifier in users and not all_entries:
+                continue
+            users.add(user.identifier)
+            result = dict()
+            for i in range(len(cols)):
+                col = cols[i]
+                result[col.identifier] = row[i + 2]
+            leaderboard.append(BenchmarkResult(user_name=user_name, submission_name=submission_name, result=result))
+        return leaderboard
+
     def has_description(self):
         """Shortcut to test of the description attribute is set.
 
@@ -112,6 +173,41 @@ class TemplateHandle(object):
         if self.template is None:
             self.template = self.store.read(self.identifier)
         return self.template
+
+    def insert_results(self, run_id, result):
+        """Insert the results of a benchmark run into the results table. Expects
+        a dictionary that contains result values for all mandatory attributes in
+        the result schema.
+
+        Parameters
+        ----------
+        run_id: string
+            Unique run identifier
+        result: dict
+                Dictionary containing run result values
+
+        Raises
+        ------
+        benchengine.error.ROBError
+        """
+        columns = list(['run_id'])
+        values = list([run_id])
+        for col in self.template.schema.columns:
+            if col.identifier in results:
+                values.append(results[col.identifier])
+            elif col.required:
+                msg = 'missing result for \'{}\''.format(col.identifier)
+                raise err.ROBError(msg)
+            else:
+                values.append(None)
+            columns.append(col.identifier)
+        sql = 'INSERT INTO {}({}) VALUES({})'.format(
+            self.result_table_name,
+            ','.join(columns),
+            ','.join(['?'] * len(columns))
+        )
+        self.con.execute(sql, values)
+        self.con.commit()
 
 
 class TemplateRepository(object):
@@ -221,7 +317,7 @@ class TemplateRepository(object):
 
         Returns
         -------
-        robtmpl.repo.base.TemplateHandle
+        robtmpl.template.repo.base.TemplateHandle
 
         Raises
         ------
@@ -257,6 +353,6 @@ class TemplateRepository(object):
 
         Returns
         -------
-        list(robtmpl.repo.base.TemplateHandle)
+        list(robtmpl.template.repo.base.TemplateHandle)
         """
         raise NotImplementedError()

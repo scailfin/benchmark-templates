@@ -10,7 +10,7 @@
 
 import pytest
 
-from robtmpl.repo.base import TemplateRepository
+from robtmpl.template.repo.base import TemplateRepository
 
 
 class TestTemplateRepository(object):

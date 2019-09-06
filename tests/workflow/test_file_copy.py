@@ -15,7 +15,7 @@ import shutil
 from robtmpl.config.install import DB
 from robtmpl.core.db.driver import DatabaseDriver
 from robtmpl.core.io.files.base import FileHandle
-from robtmpl.repo.benchmark import BenchmarkRepository
+from robtmpl.template.repo.fs import TemplateFSRepository
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.workflow.io import FileCopy
 
@@ -80,7 +80,7 @@ class TestFileCopy(object):
             dbms_id=dbms_id,
             connect_string=connect_string
         ).connect()
-        repo = BenchmarkRepository(base_dir=str(tmpdir), con=con)
+        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
         # Load first template
         template = repo.add_template(
             name='My Template',

@@ -84,7 +84,7 @@ class WorkflowState(object):
         elif type_id == STATE_SUCCESS:
             return StateSuccess.from_dict(doc)
         else:
-            raise ValueError('invalid state type \'{}\''.format(type_id))
+            raise ValueError('invalid state \'{}\''.format(type_id))
 
     def is_active(self):
         """A workflow is in active state if it is either pending or running.
