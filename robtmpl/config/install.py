@@ -37,9 +37,7 @@ class DB(object):
         # when the database is initialized. Files are executed in the order
         # of the list.
         scripts = [
-            'config/resources/db/benchrepo.sql',
-            'config/resources/db/submission.sql',
-            'config/resources/db/jobs.sql'
+            'config/resources/db/repository.sql'
         ]
         # Assumes that all script files are distributed as part of the current
         # package

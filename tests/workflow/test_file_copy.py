@@ -86,7 +86,7 @@ class TestFileCopy(object):
             name='My Template',
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE
-        ).get_workflow_template()
+        )
         # Create run directory
         run_dir = os.path.join(str(tmpdir), 'run')
         os.makedirs(run_dir)
@@ -142,7 +142,7 @@ class TestFileCopy(object):
             name='Second Template',
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE
-        ).get_workflow_template()
+        )
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
         with pytest.raises(IOError):
@@ -190,7 +190,7 @@ class TestFileCopy(object):
             name='Third Template',
             src_dir=WORKFLOW_DIR,
             template_spec_file=SPEC_FILE_ERR
-        ).get_workflow_template()
+        )
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
         # Copy input files to run directory

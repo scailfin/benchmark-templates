@@ -35,6 +35,24 @@ class ROBError(Exception):
         """
         return self.message
 
+class UnknownObjectError(ROBError):
+    """Generic error for references to unknown objects.
+    """
+    def __init__(self, obj_id, type_name='object'):
+        """Initialize error message.
+
+        Parameters
+        ----------
+        obj_id: string
+            Unique object identifier
+        type_name: string, optional
+            Name of type of the referenced object
+        """
+        super(UnknownObjectError, self).__init__(
+            message='unknown {} \'{}\''.format(type_name, obj_id)
+        )
+
+
 # -- Configuration -------------------------------------------------------------
 
 class MissingConfigurationError(ROBError):
@@ -55,7 +73,23 @@ class MissingConfigurationError(ROBError):
 
 # --  Workflow Engine ----------------------------------------------------------
 
-class UnknownRunError(ROBError):
+class DuplicateRunError(ROBError):
+    """Exception indicating that a given run identifier is not unique.
+    """
+    def __init__(self, identifier):
+        """Initialize error message for duplicate run identifier.
+
+        Parameters
+        ----------
+        identifier: string
+            Unique run identifier
+        """
+        super(DuplicateRunError, self).__init__(
+            message='non-unique run identifier \'{}\''.format(identifier)
+        )
+
+
+class UnknownRunError(UnknownObjectError):
     """Exception indicating that a given run identifier does not reference a
     known workflow run.
     """
@@ -68,7 +102,8 @@ class UnknownRunError(ROBError):
             Unique run identifier
         """
         super(UnknownRunError, self).__init__(
-            message='unknown run \'{}\''.format(identifier)
+            type_name='run',
+            obj_id=identifier
         )
 
 
@@ -122,7 +157,7 @@ class MissingArgumentError(ROBError):
         )
 
 
-class UnknownParameterError(ROBError):
+class UnknownParameterError(UnknownObjectError):
     """Exception indicating that a workflow specification references a parameter
     that is not defined for a given template.
     """
@@ -135,16 +170,16 @@ class UnknownParameterError(ROBError):
             Unique template parameter identifier
         """
         super(UnknownParameterError, self).__init__(
-            message='reference to undefined parameter \'{}\''.format(identifier)
+            type_name='parameter',
+            obj_id=identifier
         )
 
 
-class UnknownTemplateError(ROBError):
-    """Exception indicating that a given template identifier does not reference
-    an existing template.
+class UnknownTemplateError(UnknownObjectError):
+    """Error when referencing a workflow template with an unknown identifier.
     """
     def __init__(self, identifier):
-        """Initialize error message for unknown template identifier.
+        """Initialize error message.
 
         Parameters
         ----------
@@ -152,5 +187,6 @@ class UnknownTemplateError(ROBError):
             Unique template identifier
         """
         super(UnknownTemplateError, self).__init__(
-            message='unknown template \'{}\''.format(identifier)
+            type_name='template',
+            obj_id=identifier
         )

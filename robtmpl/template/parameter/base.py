@@ -209,7 +209,7 @@ class TemplateParameter(ParameterBase):
             val += ' (decimal)'
         elif self.is_int():
             val += ' (integer)'
-        elif self.is_string():
+        else:
             val += ' (string)'
         if not self.default_value is None:
             if self.is_bool() or self.is_float() or self.is_int():

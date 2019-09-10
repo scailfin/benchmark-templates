@@ -160,6 +160,10 @@ def replace_value(value, arguments, parameters):
     Returns
     -------
     string
+
+    Raises
+    ------
+    robtmpl.core.error.MissingArgumentError
     """
     # Check if the value matches the template parameter reference pattern
     if is_parameter(value):
@@ -181,7 +185,10 @@ def replace_value(value, arguments, parameters):
                 return arg.value.target()
             else:
                 return arg.value
-        # Return the parameter default value
-        return para.default_value
+        elif not para.default_value is None:
+            # Return the parameter default value
+            return para.default_value
+        else:
+            raise err.MissingArgumentError(para.identifier)
     else:
         return value

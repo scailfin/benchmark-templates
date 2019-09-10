@@ -14,8 +14,8 @@ import errno
 import os
 import shutil
 
-from robtmpl.core.io.files.base import FileHandle, InputFile
-from robtmpl.template.parameter.value import TemplateArgument
+from robtmpl.core.io.files.base import FileHandle
+from robtmpl.template.parameter.value import InputFile, TemplateArgument
 
 import robtmpl.core.error as err
 import robtmpl.template.util as tmpl

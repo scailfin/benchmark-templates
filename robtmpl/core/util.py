@@ -94,10 +94,7 @@ def read_object(filename, format=None):
             format = FORMAT_YAML
     if format.upper() == FORMAT_YAML:
         with open(filename, 'r') as f:
-            try:
-                return yaml.load(f.read(), Loader=yaml.FullLoader)
-            except yaml.parser.ParserError as ex:
-                raise ValueError(ex)
+            return yaml.load(f.read(), Loader=yaml.FullLoader)
     elif format.upper() == FORMAT_JSON:
         with open(filename, 'r') as f:
             return json.load(f)

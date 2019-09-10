@@ -10,14 +10,13 @@
 
 import os
 
-from robtmpl.template.base import WorkflowTemplate
-from robtmpl.template.io.base import TemplateStore
+from robtmpl.core.io.store.base import ObjectStore
 
 import robtmpl.core.error as err
 import robtmpl.core.util as util
 
 
-class JsonFileStore(TemplateStore):
+class JsonFileStore(ObjectStore):
     """The Json file store maintains workflow template specifications as
     separate files on disk. Files are stored under a given base directory. The
     file format is Json.
@@ -59,49 +58,48 @@ class JsonFileStore(TemplateStore):
             return os.path.join(self.base_dir, '{}.json'.format(identifier))
         else:
             # The file is in a sub-directory named after the identifier
-            sub_dir = os.path.join(self.base_dir, identifier)
+            sub_dir = util.create_dir(os.path.join(self.base_dir, identifier))
             return os.path.join(sub_dir, self.default_file_name)
 
     def read(self, identifier):
-        """Read workflow template with the given identifier from the store.
-        Raises an error if the identifier is unknown.
+        """Read object with the given identifier from the store. Raises an error
+        if the identifier is unknown.
 
         Parameters
         ----------
         identifier: string
-            Unique template identifier
+            Unique object identifier.
 
         Returns
         -------
-        robtmpl.template.base.WorkflowTemplate
+        dict
 
         Raises
         ------
-        robtmpl.core.error.UnknownTemplateError
+        robtmpl.core.error.UnknownObjectError
         """
         filename = self.get_filename(identifier)
         # Raise an error if the file does not exist
         if not os.path.isfile(filename):
-            raise err.UnknownTemplateError(identifier)
+            raise err.UnknownObjectError(obj_id=identifier)
         # Read file from disk and return template instance. The base directory
         # for the template instance is the folder that contains the
-        doc = util.read_object(filename, format=util.FORMAT_JSON)
-        return WorkflowTemplate.from_dict(doc, identifier=identifier)
+        return util.read_object(filename, format=util.FORMAT_JSON)
 
-    def write(self, template):
-        """Write the given template to the store. Replaces an existing template
+    def write(self, identifier, obj):
+        """Write the given object to the store. Replaces an existing object
         with the same identifier if it exists.
 
         Parameters
         ----------
-        template: robtmpl.template.base.WorkflowTemplate
-            Instance of a template handle class that is supported by the
-            template loader
-
+        identifier: string
+            Unique object identifier
+        obj: dict
+            Object instance
         """
-        filename = self.get_filename(template.identifier)
+        filename = self.get_filename(identifier)
         util.write_object(
-            obj=template.to_dict(),
+            obj=obj,
             filename=filename,
             format=util.FORMAT_JSON
         )

@@ -87,6 +87,7 @@ class TestReadTemplateArguments(object):
             'code/abc.py',
             '',
             'result/output.txt',
+            'skip this error',
             3,
             True,
             'XYZ',

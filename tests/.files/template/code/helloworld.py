@@ -80,4 +80,8 @@ if __name__ == '__main__':
 
     parsed_args = parser.parse_args(args)
 
-    hello(parsed_args.inputfile, parsed_args.outputfile, parsed_args.sleeptime)
+    hello(
+        parsed_args.inputfile,
+        parsed_args.outputfile,
+        parsed_args.sleeptime
+    )

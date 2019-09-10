@@ -11,10 +11,12 @@
 import os
 import pytest
 
-from robtmpl.core.io.files.base import FileHandle, InputFile
+from robtmpl.core.io.files.base import FileHandle
 from robtmpl.template.parameter.base import TemplateParameter
 from robtmpl.template.base import WorkflowTemplate
+from robtmpl.template.parameter.value import InputFile
 
+import robtmpl.template.parameter.base as pbase
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.parameter.value as values
 import robtmpl.template.base as tmpl
@@ -163,6 +165,20 @@ class TestArgumentValues(object):
             value=1,
             validate=True
         )
+        # Error for unknown data type
         arg.data_type = 'unknown'
         with pytest.raises(ValueError):
             arg.validate()
+        # Error for file handle as argument value for a file parameter with
+        # expected target path
+        with pytest.raises(ValueError):
+            values.TemplateArgument(
+                parameter=TemplateParameter(
+                    pd.parameter_declaration(
+                        'A',
+                        data_type=pd.DT_FILE,
+                        as_const=pbase.AS_INPUT
+                    )
+                ),
+                value=FileHandle(filepath='dev/null')
+            )

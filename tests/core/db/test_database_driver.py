@@ -11,6 +11,7 @@
 import os
 import pytest
 
+from robtmpl.core.db.base import DatabaseConnector
 from robtmpl.core.db.driver import DatabaseDriver as DB
 
 import robtmpl.config.base as config
@@ -18,6 +19,18 @@ import robtmpl.config.base as config
 
 class TestDatabaseDriver(object):
     """Collection of unit tests for the database driver."""
+    def test_interface(self):
+        """Test abstract interface methods to ensure that they raise
+        NotImplementedError.
+        """
+        connector = DatabaseConnector()
+        with pytest.raises(NotImplementedError):
+            connector.connect()
+        with pytest.raises(NotImplementedError):
+            connector.info()
+        with pytest.raises(NotImplementedError):
+            connector.execute(schema_file='/dev/null')
+
     def test_connect_sqlite(self, tmpdir):
         """Test instantiating database connectors."""
         # SQLite

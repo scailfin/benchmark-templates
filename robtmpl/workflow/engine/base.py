@@ -39,21 +39,28 @@ class WorkflowEngine(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def execute(self, template, arguments):
-        """Execute a given workflow template for a set of argument values.
-        Returns an unique identifier for the started workflow run.
+    def execute(self, run_id, template, source_dir, arguments):
+        """Initiate the execution of a given workflow template for a set of
+        argument values. Returns the state of the workflow.
+
+        The client provides a unique identifier for the workflow run that is
+        being used to retrieve the workflow state in future calls.
 
         Parameters
         ----------
+        run_id: string
+            Unique identifier for the workflow run.
         template: robtmpl.template.base.WorkflowTemplate
             Workflow template containing the parameterized specification and the
             parameter declarations
+        source_dir: string
+            Source directory that contains the static template files
         arguments: dict(robtmpl.template.parameter.value.TemplateArgument)
             Dictionary of argument values for parameters in the template
 
         Returns
         -------
-        string, robtmpl.workflow.state.WorkflowState
+        robtmpl.workflow.state.base.WorkflowState
         """
         raise NotImplementedError()
 
@@ -68,7 +75,7 @@ class WorkflowEngine(object):
 
         Returns
         -------
-        robtmpl.workflow.state.WorkflowState
+        robtmpl.workflow.state.base.WorkflowState
 
         Raises
         ------
@@ -76,6 +83,7 @@ class WorkflowEngine(object):
         """
         raise NotImplementedError()
 
+    @abstractmethod
     def remove_run(self, run_id):
         """Clear internal resources for for the given run. Raises error if the
         run is still active.

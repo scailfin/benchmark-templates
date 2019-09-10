@@ -13,7 +13,7 @@ the value and the meta-data in the parameter declaration.
 
 from past.builtins import basestring
 
-from robtmpl.core.io.files.base import FileHandle, InputFile
+from robtmpl.core.io.files.base import FileHandle
 from robtmpl.template.parameter.base import ParameterBase
 
 import robtmpl.template.parameter.declaration as pd
@@ -54,9 +54,8 @@ class TemplateArgument(ParameterBase):
         if parameter.is_file() and isinstance(value, FileHandle):
             if parameter.has_constant():
                 if parameter.as_input():
-                    raise ValueError(
-                        'expected input file for \'{}\''.format(self.identifier)
-                    )
+                    msg = 'expected input file for \'{}\''
+                    raise ValueError(msg.format(self.identifier))
                 else:
                     target_path = parameter.get_constant()
             else:
@@ -109,6 +108,54 @@ class TemplateArgument(ParameterBase):
                 arg.validate()
         else:
             raise ValueError('unknown data type \'{}\''.format(self.data_type))
+
+
+class InputFile(object):
+    """The InputFile represents the value for a template parameter of type
+    'file'. This class extends the handle for an uploaded file with an optional
+    target path that the user may have provided.
+    """
+    def __init__(self, f_handle, target_path=None):
+        """Initialize the object properties.
+
+        Parameters
+        ----------
+        f_handle: robtmpl.core.io.files.base.FileHandle
+        target_path: string, optional
+        """
+        self.f_handle = f_handle
+        self.target_path = target_path
+
+    @property
+    def name(self):
+        """Method for accessing the file name.
+
+        Returns
+        -------
+        string
+        """
+        return self.f_handle.file_name
+
+    def source(self):
+        """Shortcut to get the source path for the file.
+
+        Returns
+        -------
+        string
+        """
+        return self.f_handle.filepath
+
+    def target(self):
+        """Shortcut to get the target path for the file.
+
+        Returns
+        -------
+        string
+        """
+        if not self.target_path is None:
+            return self.target_path
+        else:
+            return self.f_handle.file_name
 
 
 # ------------------------------------------------------------------------------

@@ -10,9 +10,10 @@
 
 from __future__ import print_function
 
-from robtmpl.core.io.files.base import FileHandle, InputFile
+from robtmpl.core.io.files.base import FileHandle
 from robtmpl.core.io.scanner import Scanner
 from robtmpl.template.parameter.base import TemplateParameter
+from robtmpl.template.parameter.value import InputFile
 
 import robtmpl.core.error as err
 import robtmpl.template.parameter.declaration as pd
@@ -35,7 +36,7 @@ def create_parameter_index(parameters, validate=True):
 
     Returns
     -------
-    dict(robtmpl.template.parameter.base.TemplateParameter)
+    dict(string: robtmpl.template.parameter.base.TemplateParameter)
 
     Raises
     ------
@@ -54,7 +55,8 @@ def create_parameter_index(parameters, validate=True):
         p_id = para[pd.LABEL_ID]
         # Ensure that the identifier of all parameters are unique
         if p_id in result:
-            raise err.InvalidTemplateError('parameter \'{}\' not unique'.format(p_id))
+            msg = 'parameter \'{}\' not unique'.format(p_id)
+            raise err.InvalidTemplateError(msg)
         c = None
         if para[pd.LABEL_DATATYPE] in [pd.DT_LIST, pd.DT_RECORD]:
             c = list()
@@ -128,11 +130,9 @@ def read_parameter(para, scanner, prompt_prefix=''):
 
     Returns
     -------
-    bool or float or int or string or robtmpl.core.io.files.base.InputFile
+    bool or float or int or string or robtmpl.template.parameter.base.InputFile
     """
-    done = False
-    while not done:
-        done = True
+    while True:
         print(prompt_prefix + para.prompt(), end='')
         try:
             if para.is_bool():
@@ -155,4 +155,3 @@ def read_parameter(para, scanner, prompt_prefix=''):
                 return scanner.next_string(default_value=para.default_value)
         except ValueError as ex:
             print(ex)
-            done = False

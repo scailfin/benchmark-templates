@@ -15,9 +15,11 @@ import pytest
 from robtmpl.core.io.files.store import Filestore
 from robtmpl.core.tests import FakeStream
 
+import robtmpl.core.util as util
+
 
 DIR = os.path.dirname(os.path.realpath(__file__))
-LOCAL_FILE = os.path.join(DIR, '../.files/schema.json')
+LOCAL_FILE = os.path.join(DIR, '../../.files/schema.json')
 
 
 class TestFilestore(object):
@@ -50,6 +52,11 @@ class TestFilestore(object):
         fs = Filestore(directory=str(tmpdir))
         fh1 = fs.upload_file(LOCAL_FILE)
         fh2 = fs.upload_file(LOCAL_FILE)
+        # Create dummy file in file store directory
+        util.write_object(
+            filename=os.path.join(fs.directory, 'abc.json'),
+            obj={'A': 1}
+        )
         # Both files have the same name but different identifier (and point to
         # different paths)
         assert fh1.identifier != fh2.identifier

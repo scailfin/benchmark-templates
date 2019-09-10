@@ -87,7 +87,7 @@ class BenchmarkResultColumn(object):
 
         Returns
         -------
-        robtmpl.benchmark.schema.BenchmarkResultColumn
+        robtmpl.template.schema.BenchmarkResultColumn
 
         Raises
         ------
@@ -179,7 +179,7 @@ class BenchmarkResultSchema(object):
 
         Parameters
         ----------
-        columns: list(robtmpl.benchmark.schema.BenchmarkResultColumn)
+        columns: list(robtmpl.template.schema.BenchmarkResultColumn)
             List of columns in the result object
         result_file_id: string
             Identifier of the benchmark run result file that contains the
@@ -202,7 +202,7 @@ class BenchmarkResultSchema(object):
 
         Returns
         -------
-        robtmpl.benchmark.schema.BenchmarkResultSchema
+        robtmpl.template.schema.BenchmarkResultSchema
 
         Raises
         ------
@@ -239,9 +239,32 @@ class BenchmarkResultSchema(object):
         }
 
 
-# ------------------------------------------------------------------------------
-# Helper Methods
-# ------------------------------------------------------------------------------
+# -- Helper Methods ------------------------------------------------------------
+
+def create_result_table(con, table_name, schema, auto_commit=True):
+    """Create table to store benchmark results bases on a given benchmark schema
+    specification.
+
+    Parameters
+    ----------
+    con: DB-API 2.0 database connection, optional
+        Connection to underlying database
+    table_name: string
+        Name of the created database table
+    schema: robtmpl.template.schema.BenchmarkResultSchema
+        Schema of the result for extended templates that define benchmarks
+    auto_commit: bool, optional
+        Flag indicating whether changes should be committed automatically
+        after the table is created
+    """
+    cols = list(['run_id  CHAR(32) NOT NULL'])
+    for col in schema.columns:
+        cols.append(col.sql_stmt())
+    sql = 'CREATE TABLE {}({}, PRIMARY KEY(run_id))'
+    con.execute(sql.format(table_name, ','.join(cols)))
+    if auto_commit:
+        con.commit()
+
 
 def validate_doc(doc, mandatory_labels, optional_labels=[]):
     """Raises error if the dictionary contains labels that are not in the given

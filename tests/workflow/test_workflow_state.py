@@ -12,22 +12,16 @@ import datetime as dt
 import os
 import pytest
 
-from robtmpl.workflow.state import (
-    StateError, StatePending, StateRunning, StateSuccess, WorkflowState,
-    LABEL_STATE_TYPE
+from robtmpl.workflow.state.base import (
+    StateError, StatePending, StateRunning, StateSuccess, WorkflowState
 )
-from robtmpl.workflow.resource.base import FileResource
+from robtmpl.workflow.resource import FileResource
 
-DIR = os.path.dirname(os.path.realpath(__file__))
-LOCAL_FILE = os.path.join(DIR, '../.files/schema.json')
+import robtmpl.core.util as util
 
 
 class TestWorkflowStates(object):
     """Test instantiating the different workflow state classes."""
-    def test_deserialize_error(self):
-        """Test error when deserializing document with invalid type."""
-        with pytest.raises(ValueError):
-            WorkflowState.from_dict({LABEL_STATE_TYPE: 'unknown'})
 
     def test_error_state(self):
         """Test creating instances of the error state class."""
@@ -58,17 +52,6 @@ class TestWorkflowStates(object):
         assert state.started_at == started_at
         assert state.stopped_at == stopped_at
         assert len(state.messages) == 3
-        # Test serialization and deserialization
-        state = WorkflowState.from_dict(state.to_dict())
-        assert state.is_error()
-        assert not state.is_pending()
-        assert not state.is_running()
-        assert not state.is_success()
-        assert not state.is_active()
-        assert state.created_at == created_at
-        assert state.started_at == started_at
-        assert state.stopped_at == stopped_at
-        assert len(state.messages) == 3
 
     def test_pending_state(self):
         """Test creating instances of the pending state class."""
@@ -83,14 +66,10 @@ class TestWorkflowStates(object):
         running = state.start()
         assert state.created_at == running.created_at
         assert not running.started_at is None
-        # Test serialization and deserialization
-        state = WorkflowState.from_dict(state.to_dict())
-        assert (state.is_pending())
-        assert state.is_active()
-        assert not state.is_error()
-        assert not state.is_running()
-        assert not state.is_success()
-        assert state.created_at == created_at
+        state = StatePending(created_at)
+        error = state.error(messages=['there', 'was', 'a', 'error'])
+        assert error.is_error()
+        assert len(error.messages) == 4
 
     def test_running_state(self):
         """Test creating instances of the running state class."""
@@ -104,7 +83,7 @@ class TestWorkflowStates(object):
         assert not state.is_success()
         assert state.created_at == created_at
         assert state.started_at == started_at
-        # Create an exception to get error state fromrunning state
+        # Create an exception to get error state from running state
         error = state.error(messages=['Error', 'State'])
         assert error.created_at == state.created_at
         assert error.started_at == state.started_at
@@ -112,7 +91,7 @@ class TestWorkflowStates(object):
         assert error.messages[0] == 'Error'
         assert error.messages[1] == 'State'
         success = state.success(
-            resources={'myfile': FileResource('myfile', LOCAL_FILE)}
+            files={'myfile': FileResource('myfile', '/dev/null')}
         )
         assert success.is_success()
         assert not success.is_error()
@@ -121,19 +100,14 @@ class TestWorkflowStates(object):
         assert not success.is_active()
         assert success.created_at == state.created_at
         assert success.started_at == state.started_at
-        assert len(success.resources) == 1
-        # Test serialization and deserialization
-        state = WorkflowState.from_dict(state.to_dict())
-        assert state.is_active()
-        assert state.is_running()
-        assert not state.is_pending()
-        assert not state.is_error()
-        assert not state.is_success()
-        assert state.created_at == created_at
-        assert state.started_at == started_at
+        assert len(success.files) == 1
 
-    def test_success_state(self):
+    def test_success_state(self, tmpdir):
         """Test creating instances of the success state class."""
+        # Create new file resource for test purposes
+        filename = os.path.join(str(tmpdir), 'res.json')
+        util.write_object(filename=filename, obj={'A': 1})
+        # Create instance of successfule workflow state without a file resource
         created_at = dt.datetime.now()
         started_at = created_at + dt.timedelta(seconds=10)
         finished_at = started_at + dt.timedelta(seconds=10)
@@ -150,33 +124,31 @@ class TestWorkflowStates(object):
         assert state.created_at == created_at
         assert state.started_at == started_at
         assert state.finished_at == finished_at
-        assert len(state.resources) == 0
+        assert len(state.files) == 0
+        # Create state instance with file resource
         state = StateSuccess(
             created_at=created_at,
             started_at=started_at,
             finished_at=finished_at,
-            resources=[FileResource('myfile', LOCAL_FILE)]
+            files=[FileResource('myfile', filename)]
         )
         assert state.created_at == created_at
         assert state.started_at == started_at
         assert state.finished_at == finished_at
-        assert len(state.resources) == 1
-        # Test serialization and deserialization
-        state = WorkflowState.from_dict(state.to_dict())
-        assert state.is_success()
-        assert not state.is_error()
-        assert not state.is_pending()
-        assert not state.is_running()
-        assert not state.is_active()
-        assert state.created_at == created_at
-        assert state.started_at == started_at
-        assert state.finished_at == finished_at
-        assert len(state.resources) == 1
-        # Error when passing invalid resource object
+        assert len(state.files) == 1
+        # Get the file resource
+        f = state.get_file('myfile')
+        assert util.read_object(filename) == {'A': 1}
+        f.delete()
+        assert not os.path.exists(f.filename)
+        # Invalid file resource lists
         with pytest.raises(ValueError):
             StateSuccess(
                 created_at=created_at,
                 started_at=started_at,
                 finished_at=finished_at,
-                resources=FileResource('myfile', LOCAL_FILE)
+                files=[
+                    FileResource('myfile', filename),
+                    FileResource('myfile', filename)
+                ]
             )

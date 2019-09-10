@@ -16,9 +16,9 @@ import os
 import shutil
 
 from robtmpl.core.db.driver import DatabaseDriver
-from robtmpl.template.repo.base import TemplateHandle, TemplateRepository
-from robtmpl.template.base import WorkflowTemplate
-from robtmpl.template.io.json import JsonFileStore
+from robtmpl.template.repo.base import TemplateRepository
+from robtmpl.template.base import TemplateHandle, WorkflowTemplate
+from robtmpl.core.io.store.json import JsonFileStore
 
 import robtmpl.core.error as err
 import robtmpl.core.util as util
@@ -47,7 +47,7 @@ class TemplateFSRepository(TemplateRepository):
             Base directory for the repository
         con: DB-API 2.0 database connection
             Connection to underlying database
-        store: robtmpl.template.io.base.TemplateStore, optional
+        store: robtmpl.core.io.store.base.TemplateStore, optional
             Store for workflow templates
         default_filenames: list(string), optional
             List of default names for template specification files
@@ -127,7 +127,7 @@ class TemplateFSRepository(TemplateRepository):
 
         Returns
         -------
-        robtmpl.template.repo.base.TemplateHandle
+        robtmpl.template.base.TemplateHandle
 
         Raises
         ------
@@ -163,7 +163,7 @@ class TemplateFSRepository(TemplateRepository):
                 shutil.copytree(src=src_dir, dst=static_dir)
             else:
                 git.Repo.clone_from(src_repo_url, static_dir)
-        except (IOError, OSError) as ex:
+        except (IOError, OSError, git.exc.GitCommandError) as ex:
             # Make sure to cleanup by removing the created template folder
             shutil.rmtree(template_dir)
             raise ex
@@ -186,7 +186,10 @@ class TemplateFSRepository(TemplateRepository):
                     validate=True
                 )
                 # Store serialized template handle on disk
-                self.store.write(template)
+                self.store.write(
+                    identifier=template.identifier,
+                    obj=template.to_dict()
+                )
                 break
         # No template file found. Cleanup and raise error.
         if template is None:
@@ -201,12 +204,10 @@ class TemplateFSRepository(TemplateRepository):
         self.con.commit()
         # Return the template handle
         return TemplateHandle(
-            identifier=identifier,
+            template=template,
             name=name,
             description=description,
-            instructions=instructions,
-            template=template,
-            store=self.store
+            instructions=instructions
         )
 
     def delete_template(self, identifier):
@@ -268,7 +269,7 @@ class TemplateFSRepository(TemplateRepository):
 
         Returns
         -------
-        robtmpl.template.repo.base.TemplateHandle
+        robtmpl.template.base.TemplateHandle
 
         Raises
         ------
@@ -283,15 +284,13 @@ class TemplateFSRepository(TemplateRepository):
         if rs is None:
             raise err.UnknownTemplateError(identifier)
         # Get workflow template for template repository
-        template = self.store.read(identifier)
+        template = WorkflowTemplate.from_dict(self.store.read(identifier))
         # Return handle for template
         return TemplateHandle(
-            identifier=identifier,
+            template=template,
             name=rs['name'],
             description=rs['description'],
-            instructions=rs['instructions'],
-            template=template,
-            store=self.store
+            instructions=rs['instructions']
         )
 
     def list_templates(self):
@@ -299,7 +298,7 @@ class TemplateFSRepository(TemplateRepository):
 
         Returns
         -------
-        list(robtmpl.template.repo.base.TemplateHandle)
+        list(robtmpl.template.base.TemplateHandle)
         """
         sql = 'SELECT id, name, description, instructions '
         sql += 'FROM template '
@@ -308,11 +307,12 @@ class TemplateFSRepository(TemplateRepository):
         for bmark in rs:
             result.append(
                 TemplateHandle(
-                    identifier=bmark['id'],
+                    template=WorkflowTemplate.from_dict(
+                        self.store.read(bmark['id'])
+                    ),
                     name=bmark['name'],
                     description=bmark['description'],
-                    instructions=bmark['instructions'],
-                    store=self.store
+                    instructions=bmark['instructions']
                 )
             )
         return result
