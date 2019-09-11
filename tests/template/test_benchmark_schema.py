@@ -14,11 +14,11 @@ import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.schema as schema
 
 
-class TestBenchmarkResultSchema(object):
+class TestResultSchema(object):
     def test_column_serialization(self):
         """Test serialization of column objects."""
         # Ensure the required default value is set properly
-        col = schema.BenchmarkResultColumn(
+        col = schema.ResultColumn(
             identifier='col_1',
             name='Column 1',
             data_type=pd.DT_INTEGER
@@ -28,84 +28,141 @@ class TestBenchmarkResultSchema(object):
         assert col.data_type == pd.DT_INTEGER
         assert col.required
         assert type(col.required) == bool
-        assert not col.is_default
-        assert col.is_desc()
-        col = schema.BenchmarkResultColumn.from_dict(col.to_dict())
+        col = schema.ResultColumn.from_dict(col.to_dict())
         assert col.identifier == 'col_1'
         assert col.name == 'Column 1'
         assert col.data_type == pd.DT_INTEGER
         assert col.required
         assert type(col.required) == bool
-        assert not col.is_default
-        assert col.is_desc()
         # Test serialization if required value is given
-        col = schema.BenchmarkResultColumn(
+        col = schema.ResultColumn(
             identifier='col_1',
             name='Column 1',
             data_type=pd.DT_INTEGER,
-            required=False,
-            is_default=True,
-            sort_order='ASC'
+            required=False
         )
         assert col.identifier == 'col_1'
         assert col.name == 'Column 1'
         assert col.data_type == pd.DT_INTEGER
         assert not col.required
         assert type(col.required) == bool
-        assert col.is_default
-        assert not col.is_desc()
-        col = schema.BenchmarkResultColumn.from_dict(col.to_dict())
+        col = schema.ResultColumn.from_dict(col.to_dict())
         assert col.identifier == 'col_1'
         assert col.name == 'Column 1'
         assert col.data_type == pd.DT_INTEGER
         assert not col.required
         assert type(col.required) == bool
-        assert col.is_default
-        assert not col.is_desc()
 
     def test_schema_serialization(self):
         """Test creating schema objects from dictionaries and vice versa."""
-        s = schema.BenchmarkResultSchema.from_dict({
-            schema.LABEL_RESULT_FILE: 'results.json',
-            schema.LABEL_SCHEMA: [
-                schema.BenchmarkResultColumn(
-                    identifier='col_1',
-                    name='Column 1',
-                    data_type=pd.DT_INTEGER
-                ).to_dict(),
-                schema.BenchmarkResultColumn(
-                    identifier='col_2',
-                    name='Column 2',
-                    data_type=pd.DT_DECIMAL,
-                    required=True
-                ).to_dict(),
-                schema.BenchmarkResultColumn(
-                    identifier='col_3',
-                    name='Column 3',
-                    data_type=pd.DT_STRING,
-                    required=False
-                ).to_dict()
-            ]
+        columns = [
+            schema.ResultColumn(
+                identifier='col_1',
+                name='Column 1',
+                data_type=pd.DT_INTEGER
+            ).to_dict(),
+            schema.ResultColumn(
+                identifier='col_2',
+                name='Column 2',
+                data_type=pd.DT_DECIMAL,
+                required=True
+            ).to_dict(),
+            schema.ResultColumn(
+                identifier='col_3',
+                name='Column 3',
+                data_type=pd.DT_STRING,
+                required=False
+            ).to_dict()
+        ]
+        s = schema.ResultSchema.from_dict({
+            schema.SCHEMA_RESULTFILE: 'results.json',
+            schema.SCHEMA_COLUMNS: columns
         })
         self.validate_schema(s)
         # Recreate the object from its serialization
-        s = schema.BenchmarkResultSchema.from_dict(s.to_dict())
+        s = schema.ResultSchema.from_dict(s.to_dict())
         self.validate_schema(s)
-        # Error cases
+        # Schema with ORDER BY section
+        s = schema.ResultSchema.from_dict({
+            schema.SCHEMA_RESULTFILE: 'results.json',
+            schema.SCHEMA_COLUMNS: columns,
+            schema.SCHEMA_ORDERBY: [
+                schema.SortColumn(identifier='col_1').to_dict(),
+                schema.SortColumn(identifier='col_2', sort_desc=False).to_dict()
+            ]
+        })
+        self.validate_schema(s)
+        assert len(s.order_by) == 2
+        assert s.order_by[0].identifier == 'col_1'
+        assert s.order_by[0].sort_desc
+        assert s.order_by[1].identifier == 'col_2'
+        assert not s.order_by[1].sort_desc
+        # Recreate the object from its serialization
+        s = schema.ResultSchema.from_dict(s.to_dict())
+        self.validate_schema(s)
+        assert len(s.order_by) == 2
+        assert s.order_by[0].identifier == 'col_1'
+        assert s.order_by[0].sort_desc
+        assert s.order_by[1].identifier == 'col_2'
+        assert not s.order_by[1].sort_desc
+        # Sort column with only the identifier
+        col = schema.SortColumn.from_dict({schema.SORT_ID: 'ABC'})
+        assert col.identifier == 'ABC'
+        assert col.sort_desc
+        # Test different error cases
+        # - Invalid element in dictionary
         with pytest.raises(ValueError):
             doc = s.to_dict()
             doc['unknown'] = 'A'
-            schema.BenchmarkResultSchema.from_dict(doc)
+            schema.ResultSchema.from_dict(doc)
+        # - Invalid element in result column dictionary
+        doc = schema.ResultColumn(
+            identifier='col_1',
+            name='Column 1',
+            data_type=pd.DT_INTEGER
+        ).to_dict()
+        doc['sortOrder'] = 'DESC'
+        with pytest.raises(ValueError):
+            schema.ResultColumn.from_dict(doc)
+        # - Invalid element in sort column dictionary
+        doc = schema.SortColumn(identifier='col_1').to_dict()
+        doc['sortOrder'] = 'DESC'
+        with pytest.raises(ValueError):
+            schema.SortColumn.from_dict(doc)
+        # - Missing element in schema dictionary
         with pytest.raises(ValueError):
             doc = s.to_dict()
-            del doc[schema.LABEL_RESULT_FILE]
-            schema.BenchmarkResultSchema.from_dict(doc)
+            del doc[schema.SCHEMA_RESULTFILE]
+            schema.ResultSchema.from_dict(doc)
+        # - Missing element in result column dictionary
+        doc = schema.ResultColumn(
+            identifier='col_1',
+            name='Column 1',
+            data_type=pd.DT_INTEGER
+        ).to_dict()
+        del doc[schema.COLUMN_NAME]
         with pytest.raises(ValueError):
-            schema.BenchmarkResultColumn(
+            schema.ResultColumn.from_dict(doc)
+        # - Missing element in sort column dictionary
+        with pytest.raises(ValueError):
+            schema.SortColumn.from_dict({'name': 'ABC'})
+        # - Invalid data type for column
+        with pytest.raises(ValueError):
+            schema.ResultColumn(
                 identifier='col_1',
                 name='Column 1',
                 data_type=pd.DT_LIST
             )
+        # - Reference unknown attribute
+        with pytest.raises(ValueError):
+            schema.ResultSchema.from_dict({
+                schema.SCHEMA_RESULTFILE: 'results.json',
+                schema.SCHEMA_COLUMNS: columns,
+                schema.SCHEMA_ORDERBY: [
+                    schema.SortColumn(identifier='col_1').to_dict(),
+                    schema.SortColumn(identifier='col_x').to_dict()
+                ]
+            })
 
     def validate_column(self, column, identifier, name, data_type, required):
         """Ensure that the given column matches the respective arguments."""

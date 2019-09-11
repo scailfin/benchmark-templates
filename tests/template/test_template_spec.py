@@ -33,6 +33,7 @@ BENCHMARK_DIR = os.path.join(DIR, '../.files/benchmark')
 BENCHMARK_ERR_1 = 'ERROR1'
 BENCHMARK_ERR_2 = 'ERROR2'
 BENCHMARK_ERR_3 = 'ERROR3'
+BENCHMARK_ERR_4 = 'ERROR4'
 
 
 class TestWorkflowTemplate(object):
@@ -54,7 +55,7 @@ class TestWorkflowTemplate(object):
             WorkflowTemplate.from_dict({
                 tmpl.LABEL_WORKFLOW: {'A': 1, 'B': 2},
                 tmpl.LABEL_RESULTS: {
-                    schema.LABEL_SCHEMA: [{'A': 1}]
+                    schema.SCHEMA_COLUMNS: [{'A': 1}]
                 }
             })
         # Error for non-unique parameter names
@@ -76,6 +77,8 @@ class TestWorkflowTemplate(object):
             WorkflowTemplate.from_dict(loader.read(BENCHMARK_ERR_2))
         with pytest.raises(err.InvalidTemplateError):
             WorkflowTemplate.from_dict(loader.read(BENCHMARK_ERR_3))
+        with pytest.raises(err.InvalidTemplateError):
+            WorkflowTemplate.from_dict(loader.read(BENCHMARK_ERR_4))
 
     def test_get_parameter_references(self):
         """Test function to get all parameter references in a workflow

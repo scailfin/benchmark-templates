@@ -44,10 +44,7 @@ class TemplateRepository(object):
         self.max_attempts = max_attempts
 
     @abstractmethod
-    def add_template(
-        self, name, description=None, instructions=None, src_dir=None,
-        src_repo_url=None, template_spec_file=None
-    ):
+    def add_template(self, src_dir=None, src_repo_url=None, spec_file=None):
         """Create file and folder structure for a new workflow template. Assumes
         that either a workflow source directory or the Url of a remote Git
         repository is given.
@@ -74,7 +71,7 @@ class TemplateRepository(object):
             files and the template specification (optional).
         src_repo_url: string, optional
             Git repository that contains the the workflow components
-        template_spec_file: string, optional
+        spec_file: string, optional
             Path to the workflow template specification file (absolute or
             relative to the workflow directory)
 
@@ -127,7 +124,7 @@ class TemplateRepository(object):
 
         Returns
         -------
-        robtmpl.template.base.TemplateHandle
+        robtmpl.template.base.WorkflowHandle
 
         Raises
         ------
@@ -156,13 +153,3 @@ class TemplateRepository(object):
                 if attempt > self.max_attempts:
                     raise RuntimeError('could not create unique directory')
         return identifier
-
-    @abstractmethod
-    def list_templates(self):
-        """Get list of all templates in the repository.
-
-        Returns
-        -------
-        list(robtmpl.template.base.TemplateHandle)
-        """
-        raise NotImplementedError()

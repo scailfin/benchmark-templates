@@ -22,7 +22,7 @@ the modified workflow specification in which references to template parameters
 have been replaced by parameter values.
 """
 
-from robtmpl.template.schema import BenchmarkResultSchema
+from robtmpl.template.schema import ResultSchema
 
 import robtmpl.core.error as err
 import robtmpl.core.util as util
@@ -48,7 +48,7 @@ class WorkflowTemplate(object):
     parameter declarations. Parameter declarations are keyed by their unique
     identifier in the dictionary.
 
-    For benchmark templates the generate leaderboards a result schema is
+    For benchmark templates the generate leader boards a result schema is
     defined. This schema is used to store the results of different benchmark
     runs in a database.
     """
@@ -69,7 +69,7 @@ class WorkflowTemplate(object):
         parameters: dict(string:robtmpl.template.parameter.base.TemplateParameter), optional
             Dictionary of workflow template parameter declarations keyed by
             their unique identifier.
-        result_schema: robtmpl.template.schema.BenchmarkResultSchema
+        result_schema: robtmpl.template.schema.ResultSchema
             Schema of the result for extended templates that define benchmarks.
 
         Raises
@@ -164,7 +164,7 @@ class WorkflowTemplate(object):
         schema = None
         if LABEL_RESULTS in doc:
             try:
-                schema = BenchmarkResultSchema.from_dict(doc[LABEL_RESULTS])
+                schema = ResultSchema.from_dict(doc[LABEL_RESULTS])
             except ValueError as ex:
                 raise err.InvalidTemplateError(str(ex))
         # Return template instance
@@ -199,7 +199,6 @@ class WorkflowTemplate(object):
         """
         return self.result_schema
 
-
     def has_schema(self):
         """Test if the result schema is set.
 
@@ -208,7 +207,6 @@ class WorkflowTemplate(object):
         bool
         """
         return not self.result_schema is None
-
 
     def list_parameters(self):
         """Get a sorted list of parameter declarations. Elements are sorted by
@@ -242,77 +240,3 @@ class WorkflowTemplate(object):
             doc[LABEL_RESULTS] = self.result_schema.to_dict()
         # Return the template serialization
         return doc
-
-
-class TemplateHandle(WorkflowTemplate):
-    """The template handle represents workflow templates that are maintained in
-    a template repository. With each entry in the repository a set of additional
-    information is stored.
-
-    The basic information for repository entries contains the unique template
-    identifier, a unique name, an optional short description, and an optional
-    set of instructions. Both, the identifier and the name of a template are
-    expected to be unique. The name is used to identify the template in listings
-    that are visible to the user.
-    """
-    def __init__(self, template, name, description=None, instructions=None):
-        """Initialize the handle properties and the workflow template.
-
-        Parameters
-        ----------
-        template: robtmpl.template.base.WorkflowTemplate
-            Reference to the associated workflow template.
-        name: string
-            Unique template name
-        description: string, optional
-            Optional short description for display in listings
-        instructions: string, optional
-            Text containing detailed instructions for benchmark participants
-        """
-        super(TemplateHandle, self).__init__(
-            identifier=template.identifier,
-            parameters=template.parameters,
-            workflow_spec=template.workflow_spec,
-            result_schema=template.result_schema
-        )
-        self.name = name
-        self.description = description
-        self.instructions = instructions
-
-    def get_description(self):
-        """Get the value of description attribute. Returns an empty string
-        if the attribute is None.
-
-        Returns
-        -------
-        string
-        """
-        return self.description if not self.description is None else ''
-
-    def get_instructions(self):
-        """Get the value of instructions attribute. Returns an empty string
-        if the attribute is None.
-
-        Returns
-        -------
-        string
-        """
-        return self.instructions if not self.instructions is None else ''
-
-    def has_description(self):
-        """Shortcut to test of the description attribute is set.
-
-        Returns
-        -------
-        bool
-        """
-        return not self.description is None
-
-    def has_instructions(self):
-        """Test if the instructions for the benchmark are set.
-
-        Returns
-        -------
-        bool
-        """
-        return not self.instructions is None

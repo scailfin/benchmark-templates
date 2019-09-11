@@ -11,37 +11,35 @@ is part of the extended workflow template specification that is used to define
 benchmarks.
 """
 
+import robtmpl.core.util as util
 import robtmpl.template.parameter.declaration as pd
+
 
 """Supported data types for result values."""
 DATA_TYPES = [pd.DT_DECIMAL, pd.DT_INTEGER, pd.DT_STRING]
 
 
 """Labels for serialization."""
-LABEL_ID = 'id'
-LABEL_IS_DEFAULT = 'isDefault'
-LABEL_NAME = 'name'
-LABEL_RESULT_FILE = 'file'
-LABEL_REQUIRED = 'required'
-LABEL_SCHEMA = 'schema'
-LABEL_SORT_ORDER = 'sortOrder'
-LABEL_TYPE = 'type'
-
-COLUMN_LABELS = [LABEL_ID, LABEL_NAME, LABEL_TYPE]
-SCHEMA_LABELS = [LABEL_RESULT_FILE, LABEL_SCHEMA]
-
-
-"""Column sort orders."""
-SORT_ASC = 'ASC'
-SORT_DESC = 'DESC'
+# Column specification
+COLUMN_ID = 'id'
+COLUMN_NAME = 'name'
+COLUMN_REQUIRED = 'required'
+COLUMN_TYPE = 'type'
+# Leader board default sort order
+SORT_ID = COLUMN_ID
+SORT_DESC = 'sortDesc'
+# Schema specification
+SCHEMA_RESULTFILE = 'file'
+SCHEMA_COLUMNS = 'schema'
+SCHEMA_ORDERBY = 'orderBy'
 
 
-class BenchmarkResultColumn(object):
+class ResultColumn(object):
     """Column in the result schema of a benchmark. Each column has a unique
     identifier and unique name. The identifier is used as column name in the
-    database schema. the name is for display purposes in the user interface.
+    database schema. The name is for display purposes in a user interface.
     """
-    def __init__(self, identifier, name, data_type, required=None, is_default=None, sort_order=None):
+    def __init__(self, identifier, name, data_type, required=None):
         """Initialize the unique column identifier, name, and the data type. If
         the value of data_type is not in the list of supported data types an
         error is raised.
@@ -57,11 +55,10 @@ class BenchmarkResultColumn(object):
         required: bool, optional
             Indicates whether a value is expected for this column in every
             benchmark run result
-        is_default: bool, optional
-            Indicates whether this column is the default sort column for the
-            benchmark leaderboard
-        sort_order: string, optional
-            Sort order for this column when generating the leaderboard
+
+        Raises
+        ------
+        ValueError
         """
         # Raise error if the data type value is not in the list of supported
         # data types
@@ -71,8 +68,6 @@ class BenchmarkResultColumn(object):
         self.name = name
         self.data_type = data_type
         self.required = required if not required is None else True
-        self.is_default = is_default if not is_default is None else False
-        self.sort_order = sort_order if not sort_order is None else SORT_DESC
 
     @staticmethod
     def from_dict(doc):
@@ -87,69 +82,25 @@ class BenchmarkResultColumn(object):
 
         Returns
         -------
-        robtmpl.template.schema.BenchmarkResultColumn
+        robtmpl.template.schema.ResultColumn
 
         Raises
         ------
         ValueError
         """
         # Validate the serialization dictionary
-        validate_doc(
+        util.validate_doc(
             doc,
-            COLUMN_LABELS,
-            optional_labels=[LABEL_REQUIRED, LABEL_IS_DEFAULT, LABEL_SORT_ORDER]
+            mandatory_labels=[COLUMN_ID, COLUMN_NAME, COLUMN_TYPE],
+            optional_labels=[COLUMN_REQUIRED]
         )
         # Return instance of the column object
-        return BenchmarkResultColumn(
-            identifier=doc[LABEL_ID],
-            name=doc[LABEL_NAME],
-            data_type=doc[LABEL_TYPE],
-            required=doc.get(LABEL_REQUIRED),
-            is_default=doc.get(LABEL_IS_DEFAULT),
-            sort_order=doc.get(LABEL_SORT_ORDER)
+        return ResultColumn(
+            identifier=doc[COLUMN_ID],
+            name=doc[COLUMN_NAME],
+            data_type=doc[COLUMN_TYPE],
+            required=doc.get(COLUMN_REQUIRED)
         )
-
-    def is_desc(self):
-        """True if the values in this columns are sorted in descending order
-        when generating the leaderboard.
-
-        Returns
-        -------
-        bool
-        """
-        return self.sort_order == SORT_DESC
-
-    def sort_statement(self):
-        """Get column identifier and the optional sort order statement depending
-        on the current value for the sort order attribute. The result is to be
-        used when generating SQL queries that fetch benchmark results.
-
-        Returns
-        -------
-        string
-        """
-        if self.is_desc():
-            return self.identifier + ' DESC'
-        else:
-            return self.identifier
-
-    def sql_stmt(self):
-        """SQL statement for column in create table statement.
-
-        Returns
-        -------
-        string
-        """
-        stmt = self.identifier
-        if self.data_type == pd.DT_INTEGER:
-            stmt += ' INTEGER'
-        elif self.data_type == pd.DT_DECIMAL:
-            stmt += ' DOUBLE'
-        else:
-            stmt += ' TEXT'
-        if self.required:
-            stmt += ' NOT NULL'
-        return stmt
 
     def to_dict(self):
         """Get dictionary serialization for the column object.
@@ -159,34 +110,39 @@ class BenchmarkResultColumn(object):
         dict
         """
         return {
-            LABEL_ID: self.identifier,
-            LABEL_NAME: self.name,
-            LABEL_TYPE: self.data_type,
-            LABEL_REQUIRED: self.required,
-            LABEL_IS_DEFAULT: self.is_default,
-            LABEL_SORT_ORDER: self.sort_order
+            COLUMN_ID: self.identifier,
+            COLUMN_NAME: self.name,
+            COLUMN_TYPE: self.data_type,
+            COLUMN_REQUIRED: self.required
         }
 
 
-class BenchmarkResultSchema(object):
+class ResultSchema(object):
     """The result schema of a benchmark run is a collection of columns. The
-    result object of the run is expected to contain a value for each required
-    column and at most for all columns. The schema also contains the identifier
-    of the output file that contains the result object.
+    result schema is used to generate leader boards for benchmarks.
+
+    The schema also contains the identifier of the output file that contains the
+    result object. The result object that is generated by each benchmark  run is
+    expected to contain a value for each required columns in the schema.
     """
-    def __init__(self, columns, result_file_id):
-        """Initialize the schema columns and the result file identifier.
+    def __init__(self, result_file_id, columns, order_by=None):
+        """Initialize the result file identifier, schema columns, and the
+        default sort order.
 
         Parameters
         ----------
-        columns: list(robtmpl.template.schema.BenchmarkResultColumn)
-            List of columns in the result object
         result_file_id: string
             Identifier of the benchmark run result file that contains the
             analytics results.
+        columns: list(robtmpl.template.schema.ResultColumn)
+            List of columns in the result object
+        order_by: list(robtmpl.template.schema.SortColumn)
+            List of columns that define the default sort order for entries in
+            the leader board.
         """
-        self.columns = columns
         self.result_file_id = result_file_id
+        self.columns = columns
+        self.order_by = order_by if not order_by is None else list()
 
     @staticmethod
     def from_dict(doc):
@@ -202,29 +158,50 @@ class BenchmarkResultSchema(object):
 
         Returns
         -------
-        robtmpl.template.schema.BenchmarkResultSchema
+        robtmpl.template.schema.ResultSchema
 
         Raises
         ------
         ValueError
         """
         # Validate the serialization dictionary
-        validate_doc(doc, SCHEMA_LABELS)
+        util.validate_doc(
+            doc,
+            mandatory_labels=[SCHEMA_RESULTFILE, SCHEMA_COLUMNS],
+            optional_labels=[SCHEMA_ORDERBY]
+        )
+        # Identifier of the output file that contains the result object
+        file_id = doc[SCHEMA_RESULTFILE]
         # Get column list. Ensure that all column names and identifier are
         # unique
-        columns=[BenchmarkResultColumn.from_dict(c) for c in doc[LABEL_SCHEMA]]
+        columns=[ResultColumn.from_dict(c) for c in doc[SCHEMA_COLUMNS]]
         ids = set()
         names = set()
         for col in columns:
             if col.identifier in ids:
-                raise ValueError('duplicate column identifier \'{}\''.format(col.identifier))
+                msg = 'duplicate column identifier \'{}\''
+                raise ValueError(msg.format(col.identifier))
             ids.add(col.identifier)
             if col.name in names:
-                raise ValueError('not unique column name \'{}\''.format(col.name))
+                msg = 'not unique column name \'{}\''
+                raise ValueError(msg.format(col.name))
             names.add(col.name)
-        file_id = doc[LABEL_RESULT_FILE]
-        # Return instance of the column object
-        return BenchmarkResultSchema(columns=columns, result_file_id=file_id)
+        # Get optional default sort statement for the ranking
+        order_by = list()
+        if SCHEMA_ORDERBY in doc:
+            # Ensure that the column identifier reference columns in the schema
+            for c in doc[SCHEMA_ORDERBY]:
+                col = SortColumn.from_dict(c)
+                if not col.identifier in ids:
+                    msg = 'unknown column \'{}\''
+                    raise ValueError(msg.format(col.identifier))
+                order_by.append(col)
+        # Return benchmark schema object
+        return ResultSchema(
+            result_file_id=file_id,
+            columns=columns,
+            order_by=order_by
+        )
 
     def to_dict(self):
         """Get dictionary serialization for the result schema object.
@@ -234,62 +211,68 @@ class BenchmarkResultSchema(object):
         dict
         """
         return {
-            LABEL_RESULT_FILE: self.result_file_id,
-            LABEL_SCHEMA: [col.to_dict() for col in self.columns]
+            SCHEMA_RESULTFILE: self.result_file_id,
+            SCHEMA_COLUMNS: [col.to_dict() for col in self.columns],
+            SCHEMA_ORDERBY: [col.to_dict() for col in self.order_by]
         }
 
 
-# -- Helper Methods ------------------------------------------------------------
-
-def create_result_table(con, table_name, schema, auto_commit=True):
-    """Create table to store benchmark results bases on a given benchmark schema
-    specification.
-
-    Parameters
-    ----------
-    con: DB-API 2.0 database connection, optional
-        Connection to underlying database
-    table_name: string
-        Name of the created database table
-    schema: robtmpl.template.schema.BenchmarkResultSchema
-        Schema of the result for extended templates that define benchmarks
-    auto_commit: bool, optional
-        Flag indicating whether changes should be committed automatically
-        after the table is created
+class SortColumn(object):
+    """The sort column defines part of an ORDER BY statement that is used to
+    sort benchmark results when creating the benchmark leader board. Each object
+    contains a reference to a result column and a flag indicating the sort
+    order for values in the column.
     """
-    cols = list(['run_id  CHAR(32) NOT NULL'])
-    for col in schema.columns:
-        cols.append(col.sql_stmt())
-    sql = 'CREATE TABLE {}({}, PRIMARY KEY(run_id))'
-    con.execute(sql.format(table_name, ','.join(cols)))
-    if auto_commit:
-        con.commit()
+    def __init__(self, identifier, sort_desc=None):
+        """Initialize the object properties.
 
+        Parameters
+        ----------
+        identifier: string
+            Unique column identifier
+        sort_desc: bool, optional
+            Sort values in descending order if True or in ascending order
+            otherwise
+        """
+        self.identifier = identifier
+        self.sort_desc = sort_desc if not sort_desc is None else True
 
-def validate_doc(doc, mandatory_labels, optional_labels=[]):
-    """Raises error if the dictionary contains labels that are not in the given
-    label lists or if there are labels in the mandatory list that are not in the
-    dictionary.
+    @staticmethod
+    def from_dict(doc):
+        """Get an instance of the sort column from the dictionary serialization.
+        Raises an error if the given dictionary does not contain the expected
+        elements as generated by the to_dict() method of the class.
 
-    Paramaters
-    ----------
-    doc: dict
-        Dictionary serialization of an object
-    mandatory_labels: list(string)
-        List of mandatory labels for the dictionary serialization
-    optional_labels: list(string), optional
-        List of optional labels for the dictionary serialization
+        Parameters
+        ----------
+        doc: dict
+            Dictionary serialization of a column object
 
-    Raises
-    ------
-    ValueError
-    """
-    # Ensure that all mandatory labels are present in the dictionary
-    for key in mandatory_labels:
-        if not key in doc:
-            raise ValueError('missing element \'{}\''.format(key))
-    # Raise error if additional elements are present in the dictionary
-    labels = mandatory_labels + optional_labels
-    for key in doc:
-        if not key in labels:
-            raise ValueError('unknown element \'{}\''.format(key))
+        Returns
+        -------
+        robtmpl.template.schema.SortColumn
+
+        Raises
+        ------
+        ValueError
+        """
+        # Validate the serialization dictionary
+        util.validate_doc(
+            doc,
+            mandatory_labels=[SORT_ID],
+            optional_labels=[SORT_DESC]
+        )
+        sort_desc = None
+        if SORT_DESC in doc:
+            sort_desc = doc[SORT_DESC]
+        # Return instance of the column object
+        return SortColumn(identifier=doc[SORT_ID], sort_desc=sort_desc)
+
+    def to_dict(self):
+        """Get dictionary serialization for the sort column object.
+
+        Returns
+        -------
+        dict
+        """
+        return {SORT_ID: self.identifier, SORT_DESC: self.sort_desc}

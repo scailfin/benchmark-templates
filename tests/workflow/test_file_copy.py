@@ -12,16 +12,12 @@ import os
 import pytest
 import shutil
 
-from robtmpl.config.install import DB
-from robtmpl.core.db.driver import DatabaseDriver
 from robtmpl.core.io.files.base import FileHandle
 from robtmpl.template.repo.fs import TemplateFSRepository
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.workflow.io import FileCopy
 
-import robtmpl.config.base as config
 import robtmpl.core.error as err
-import robtmpl.core.db.driver as driver
 import robtmpl.workflow.io as backend
 
 
@@ -72,20 +68,12 @@ class TestFileCopy(object):
 
     def test_prepare_inputs_for_local_run(self, tmpdir):
         """Test copying input files for a local workflow run."""
-        # Initialize the database and repository
-        connect_string = '{}/{}'.format(str(tmpdir), config.DEFAULT_DATABASE)
-        dbms_id = driver.SQLITE[0]
-        DB.init(dbms_id=dbms_id, connect_string=connect_string)
-        con = DatabaseDriver.get_connector(
-            dbms_id=dbms_id,
-            connect_string=connect_string
-        ).connect()
-        repo = TemplateFSRepository(base_dir=str(tmpdir), con=con)
+        # Initialize the repository
+        repo = TemplateFSRepository(base_dir=str(tmpdir))
         # Load first template
         template = repo.add_template(
-            name='My Template',
             src_dir=WORKFLOW_DIR,
-            template_spec_file=SPEC_FILE
+            spec_file=SPEC_FILE
         )
         # Create run directory
         run_dir = os.path.join(str(tmpdir), 'run')
@@ -139,9 +127,8 @@ class TestFileCopy(object):
             )
         # Error when copying non-existing file
         template = repo.add_template(
-            name='Second Template',
             src_dir=WORKFLOW_DIR,
-            template_spec_file=SPEC_FILE
+            spec_file=SPEC_FILE
         )
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)
@@ -187,9 +174,8 @@ class TestFileCopy(object):
         assert os.path.isfile(os.path.join(run_dir, 'data', 'friends.txt'))
         # Template with input file parameter that is not of type file
         template = repo.add_template(
-            name='Third Template',
             src_dir=WORKFLOW_DIR,
-            template_spec_file=SPEC_FILE_ERR
+            spec_file=SPEC_FILE_ERR
         )
         shutil.rmtree(run_dir)
         os.makedirs(run_dir)

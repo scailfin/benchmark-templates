@@ -121,6 +121,35 @@ def to_datetime(timestamp):
         return datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S')
 
 
+def validate_doc(doc, mandatory_labels, optional_labels=[]):
+    """Raises error if a dictionary contains labels that are not in the given
+    label lists or if there are labels in the mandatory list that are not in the
+    dictionary.
+
+    Paramaters
+    ----------
+    doc: dict
+        Dictionary serialization of an object
+    mandatory_labels: list(string)
+        List of mandatory labels for the dictionary serialization
+    optional_labels: list(string), optional
+        List of optional labels for the dictionary serialization
+
+    Raises
+    ------
+    ValueError
+    """
+    # Ensure that all mandatory labels are present in the dictionary
+    for key in mandatory_labels:
+        if not key in doc:
+            raise ValueError('missing element \'{}\''.format(key))
+    # Raise error if additional elements are present in the dictionary
+    labels = mandatory_labels + optional_labels
+    for key in doc:
+        if not key in labels:
+            raise ValueError('unknown element \'{}\''.format(key))
+
+
 def write_object(filename, obj, format=None):
     """Write given dictionary to file as Json object.
 
