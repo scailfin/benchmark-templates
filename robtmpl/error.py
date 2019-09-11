@@ -53,24 +53,6 @@ class UnknownObjectError(ROBError):
         )
 
 
-# -- Configuration -------------------------------------------------------------
-
-class MissingConfigurationError(ROBError):
-    """Error indicating that the value for an environment variable is not set.
-    """
-    def __init__(self, var_name):
-        """Initialize error message.
-
-        Parameters
-        ----------
-        var_name: string
-            Environment variable name
-        """
-        super(MissingConfigurationError, self).__init__(
-            message='variable \'{}\' not set'.format(var_name)
-        )
-
-
 # --  Workflow Engine ----------------------------------------------------------
 
 class DuplicateRunError(ROBError):

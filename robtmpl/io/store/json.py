@@ -10,9 +10,9 @@
 
 import os
 
-from robtmpl.core.io.store.base import ObjectStore
+from robtmpl.io.store.base import ObjectStore
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 
 
@@ -76,7 +76,7 @@ class JsonFileStore(ObjectStore):
 
         Raises
         ------
-        robtmpl.core.error.UnknownObjectError
+        robtmpl.error.UnknownObjectError
         """
         filename = self.get_filename(identifier)
         # Raise an error if the file does not exist

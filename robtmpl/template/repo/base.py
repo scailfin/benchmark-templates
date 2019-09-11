@@ -81,8 +81,8 @@ class TemplateRepository(object):
 
         Raises
         ------
-        robtmpl.core.error.InvalidParameterError
-        robtmpl.core.error.InvalidTemplateError
+        robtmpl.error.InvalidParameterError
+        robtmpl.error.InvalidTemplateError
         ValueError
         """
         raise NotImplementedError()
@@ -128,7 +128,7 @@ class TemplateRepository(object):
 
         Raises
         ------
-        robtmpl.core.error.UnknownTemplateError
+        robtmpl.error.UnknownTemplateError
         """
         raise NotImplementedError()
 

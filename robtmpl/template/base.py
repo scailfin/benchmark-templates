@@ -24,7 +24,7 @@ have been replaced by parameter values.
 
 from robtmpl.template.schema import ResultSchema
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 import robtmpl.template.parameter.util as wfputil
 import robtmpl.template.util as tmplutil
@@ -74,7 +74,7 @@ class WorkflowTemplate(object):
 
         Raises
         ------
-        robtmpl.core.error.InvalidTemplateError
+        robtmpl.error.InvalidTemplateError
         """
         # Set the unique identifier. If no identifier is given an new one is
         # created.
@@ -132,8 +132,8 @@ class WorkflowTemplate(object):
 
         Raises
         ------
-        robtmpl.core.error.InvalidTemplateError
-        robtmpl.core.error.UnknownParameterError
+        robtmpl.error.InvalidTemplateError
+        robtmpl.error.UnknownParameterError
         """
         # Ensure that the mandatory elements are present. At this point, only
         # the workflow specification is mandatory.

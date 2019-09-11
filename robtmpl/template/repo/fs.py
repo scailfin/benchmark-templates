@@ -17,9 +17,9 @@ import shutil
 
 from robtmpl.template.repo.base import TemplateRepository
 from robtmpl.template.base import WorkflowTemplate
-from robtmpl.core.io.store.json import JsonFileStore
+from robtmpl.io.store.json import JsonFileStore
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 import robtmpl.template.repo.base as base
 
@@ -44,7 +44,7 @@ class TemplateFSRepository(TemplateRepository):
         ----------
         base_dir: string
             Base directory for the repository
-        store: robtmpl.core.io.store.base.TemplateStore, optional
+        store: robtmpl.io.store.base.TemplateStore, optional
             Store for workflow templates
         default_filenames: list(string), optional
             List of default names for template specification files
@@ -112,7 +112,7 @@ class TemplateFSRepository(TemplateRepository):
 
         Raises
         ------
-        robtmpl.core.error.InvalidTemplateError
+        robtmpl.error.InvalidTemplateError
         ValueError
         """
         # Exactly one of src_dir and src_repo_url has to be not None. If both
@@ -225,7 +225,7 @@ class TemplateFSRepository(TemplateRepository):
 
         Raises
         ------
-        robtmpl.core.error.UnknownTemplateError
+        robtmpl.error.UnknownTemplateError
         """
         # The underlying object store will raise an UnknownObjectError if the
         # templaet is unknown. 

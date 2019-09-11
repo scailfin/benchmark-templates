@@ -16,7 +16,7 @@ import sqlite3
 from robtmpl.template.repo.base import TemplateRepository
 from robtmpl.template.repo.fs import TemplateFSRepository
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

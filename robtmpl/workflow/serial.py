@@ -79,7 +79,7 @@ class SerialWorkflow(object):
 
         Raises
         ------
-        robtmpl.core.error.MissingArgumentError
+        robtmpl.error.MissingArgumentError
         """
         # Get the input/parameters dictionary from the workflow specification and
         # replace all references to template parameters with the given arguments

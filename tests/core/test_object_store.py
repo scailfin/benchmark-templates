@@ -13,10 +13,10 @@ implementation.
 import os
 import pytest
 
-from robtmpl.core.io.store.base import ObjectStore
-from robtmpl.core.io.store.json import JsonFileStore
+from robtmpl.io.store.base import ObjectStore
+from robtmpl.io.store.json import JsonFileStore
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 
 

@@ -13,13 +13,13 @@ engine implementation.
 import os
 import pytest
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.base import WorkflowTemplate
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.workflow.engine.base import WorkflowEngine
 from robtmpl.workflow.engine.sync import SyncWorkflowEngine
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 
 

@@ -10,7 +10,7 @@
 
 import pytest
 
-from robtmpl.core.io.scanner import Scanner, ListReader
+from robtmpl.io.scanner import Scanner, ListReader
 from robtmpl.template.parameter.base import TemplateParameter, AS_INPUT
 from robtmpl.template.base import WorkflowTemplate
 

@@ -10,7 +10,7 @@
 
 import pytest
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.schema as schema
 

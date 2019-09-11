@@ -12,12 +12,12 @@ import os
 import pytest
 import shutil
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.repo.fs import TemplateFSRepository
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.workflow.io import FileCopy
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.workflow.io as backend
 
 

@@ -10,7 +10,7 @@
 
 from past.builtins import basestring
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 
 
 def get_parameter_name(value):
@@ -46,7 +46,7 @@ def get_parameter_references(spec, parameters=None):
 
     Raises
     ------
-    robtmpl.core.error.InvalidTemplateError
+    robtmpl.error.InvalidTemplateError
     """
     # The new object will contain the modified workflow specification
     if parameters is None:
@@ -119,7 +119,7 @@ def replace_args(spec, arguments, parameters):
 
     Raises
     ------
-    robtmpl.core.error.InvalidTemplateError
+    robtmpl.error.InvalidTemplateError
     """
     if isinstance(spec, dict):
         # The new object will contain the modified workflow specification
@@ -163,7 +163,7 @@ def replace_value(value, arguments, parameters):
 
     Raises
     ------
-    robtmpl.core.error.MissingArgumentError
+    robtmpl.error.MissingArgumentError
     """
     # Check if the value matches the template parameter reference pattern
     if is_parameter(value):

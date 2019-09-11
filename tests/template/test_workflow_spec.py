@@ -10,7 +10,7 @@
 specification.
 """
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.parameter.base import TemplateParameter
 from robtmpl.template.parameter.value import TemplateArgument
 

@@ -36,7 +36,7 @@ class ObjectStore(object):
 
         Raises
         ------
-        robtmpl.core.error.UnknownObjectError
+        robtmpl.error.UnknownObjectError
         """
         raise NotImplementedError()
 

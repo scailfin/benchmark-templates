@@ -13,7 +13,7 @@ import yaml
 
 from robtmpl.template.parameter.base import TemplateParameter
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.parameter.util as putil
 

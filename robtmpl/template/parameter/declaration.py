@@ -16,7 +16,7 @@ declarations from within Python scripts.
 
 from jsonschema import validate, ValidationError
 
-from robtmpl.core.error import InvalidParameterError
+from robtmpl.error import InvalidParameterError
 
 
 # ------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ def parameter_declaration(
 
     Raises
     ------
-    robtmpl.core.error.InvalidParameterError
+    robtmpl.error.InvalidParameterError
     """
     if identifier is None:
         raise InvalidParameterError('missing identifier')
@@ -261,7 +261,7 @@ def validate_parameter(param_declaration):
 
     Raises
     ------
-    robtmpl.core.error.InvalidParameterError
+    robtmpl.error.InvalidParameterError
     """
     # Make sure that the given package declaration matches the schema
     try:

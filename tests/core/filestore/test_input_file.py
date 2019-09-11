@@ -9,7 +9,7 @@
 """Test input file handle."""
 
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.parameter.value import InputFile
 
 

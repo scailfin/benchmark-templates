@@ -10,12 +10,12 @@
 
 from __future__ import print_function
 
-from robtmpl.core.io.files.base import FileHandle
-from robtmpl.core.io.scanner import Scanner
+from robtmpl.io.files.base import FileHandle
+from robtmpl.io.scanner import Scanner
 from robtmpl.template.parameter.base import TemplateParameter
 from robtmpl.template.parameter.value import InputFile
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.template.parameter.declaration as pd
 
 
@@ -40,8 +40,8 @@ def create_parameter_index(parameters, validate=True):
 
     Raises
     ------
-    robtmpl.core.error.InvalidTemplateError
-    robtmpl.core.error.UnknownParameterError
+    robtmpl.error.InvalidTemplateError
+    robtmpl.error.UnknownParameterError
     """
     result = dict()
     for para in parameters:
@@ -87,7 +87,7 @@ def read(parameters, scanner=None):
     ----------
     parameters: list(robtmpl.template.parameter.base.TemplateParameter)
         List of workflow template parameter declarations
-    scanner: robtmpl.core.io.scanner.Scanner
+    scanner: robtmpl.io.scanner.Scanner
         Input scanner to read parameter values
 
     Returns

@@ -14,10 +14,10 @@ import errno
 import os
 import shutil
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.parameter.value import InputFile, TemplateArgument
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.template.util as tmpl
 
 
@@ -99,9 +99,9 @@ def upload_files(template, base_dir, files, arguments, loader):
 
     Raises
     ------
-    robtmpl.core.error.InvalidTemplateError
-    robtmpl.core.error.MissingArgumentError
-    robtmpl.core.error.UnknownParameterError
+    robtmpl.error.InvalidTemplateError
+    robtmpl.error.MissingArgumentError
+    robtmpl.error.UnknownParameterError
     """
     for val in files:
         # Set source and target values depending on whether the list

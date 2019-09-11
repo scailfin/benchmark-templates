@@ -11,7 +11,7 @@
 import os
 import pytest
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.parameter.base import TemplateParameter
 from robtmpl.template.base import WorkflowTemplate
 from robtmpl.template.parameter.value import InputFile

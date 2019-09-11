@@ -11,13 +11,13 @@
 import os
 import pytest
 
-from robtmpl.core.io.files.base import FileHandle
-from robtmpl.core.io.store.json import JsonFileStore
+from robtmpl.io.files.base import FileHandle
+from robtmpl.io.store.json import JsonFileStore
 from robtmpl.template.parameter.base import TemplateParameter
 from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.template.base import WorkflowTemplate
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.base as tmpl

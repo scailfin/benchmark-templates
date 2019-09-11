@@ -29,7 +29,7 @@ class Scanner(object):
 
         Parameters
         ----------
-        reader: robtmpl.core.io.scanner.TokenReader
+        reader: robtmpl.io.scanner.TokenReader
             Reader for input tokens
         """
         self.reader = reader if not reader is None else InputReader()

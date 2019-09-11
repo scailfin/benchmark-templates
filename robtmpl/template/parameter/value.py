@@ -13,7 +13,7 @@ the value and the meta-data in the parameter declaration.
 
 from past.builtins import basestring
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 from robtmpl.template.parameter.base import ParameterBase
 
 import robtmpl.template.parameter.declaration as pd
@@ -120,7 +120,7 @@ class InputFile(object):
 
         Parameters
         ----------
-        f_handle: robtmpl.core.io.files.base.FileHandle
+        f_handle: robtmpl.io.files.base.FileHandle
         target_path: string, optional
         """
         self.f_handle = f_handle

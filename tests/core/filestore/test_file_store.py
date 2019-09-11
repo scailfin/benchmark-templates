@@ -12,7 +12,7 @@ import datetime
 import os
 import pytest
 
-from robtmpl.core.io.files.store import Filestore
+from robtmpl.io.files.store import Filestore
 from robtmpl.core.tests import FakeStream
 
 import robtmpl.core.util as util

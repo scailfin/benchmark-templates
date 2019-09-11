@@ -16,7 +16,7 @@ import shutil
 from robtmpl.workflow.engine.base import WorkflowEngine
 from robtmpl.workflow.serial import SerialWorkflow
 
-import robtmpl.core.error as err
+import robtmpl.error as err
 import robtmpl.core.util as util
 import robtmpl.workflow.state.serializer as serialize
 
@@ -79,7 +79,7 @@ class SyncWorkflowEngine(WorkflowEngine):
 
         Raises
         ------
-        robtmpl.core.error.DuplicateRunError
+        robtmpl.error.DuplicateRunError
         """
         # Create run folder and run state file. If either of the two exists we
         # assume that the given run identifier is not unique.
@@ -142,7 +142,7 @@ class SyncWorkflowEngine(WorkflowEngine):
 
         Raises
         ------
-        robtmpl.core.error.UnknownRunError
+        robtmpl.error.UnknownRunError
         """
         run_file = self.get_run_file(run_id)
         if os.path.isfile(run_file):

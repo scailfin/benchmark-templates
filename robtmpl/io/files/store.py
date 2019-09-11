@@ -19,7 +19,7 @@ references to the actual files on disk managed by the file store.
 import os
 import shutil
 
-from robtmpl.core.io.files.base import FileHandle
+from robtmpl.io.files.base import FileHandle
 import robtmpl.core.util as util
 
 
@@ -72,7 +72,7 @@ class Filestore(object):
 
         Returns
         -------
-        robtmpl.core.io.files.base.FileHandle
+        robtmpl.io.files.base.FileHandle
         """
         file_dir = self.get_file_dir(identifier)
         if os.path.isdir(file_dir):
@@ -112,7 +112,7 @@ class Filestore(object):
 
         Returns
         -------
-        list(robtmpl.core.io.files.base.FileHandle)
+        list(robtmpl.io.files.base.FileHandle)
         """
         result = list()
         for f_name in os.listdir(self.directory):
@@ -140,7 +140,7 @@ class Filestore(object):
 
         Returns
         -------
-        robtmpl.core.io.files.base.FileHandle
+        robtmpl.io.files.base.FileHandle
         """
         # Ensure that the given file exists
         if not os.path.isfile(filename):
@@ -173,7 +173,7 @@ class Filestore(object):
 
         Returns
         -------
-        robtmpl.core.io.files.base.FileHandle
+        robtmpl.io.files.base.FileHandle
         """
         # Create a new unique identifier for the file.
         identifier = util.get_unique_identifier()
