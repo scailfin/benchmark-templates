@@ -10,6 +10,7 @@
 
 import pytest
 
+import robtmpl.core.error as err
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.schema as schema
 
@@ -111,7 +112,7 @@ class TestResultSchema(object):
         assert col.sort_desc
         # Test different error cases
         # - Invalid element in dictionary
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             doc = s.to_dict()
             doc['unknown'] = 'A'
             schema.ResultSchema.from_dict(doc)
@@ -122,15 +123,15 @@ class TestResultSchema(object):
             data_type=pd.DT_INTEGER
         ).to_dict()
         doc['sortOrder'] = 'DESC'
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             schema.ResultColumn.from_dict(doc)
         # - Invalid element in sort column dictionary
         doc = schema.SortColumn(identifier='col_1').to_dict()
         doc['sortOrder'] = 'DESC'
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             schema.SortColumn.from_dict(doc)
         # - Missing element in schema dictionary
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             doc = s.to_dict()
             del doc[schema.SCHEMA_RESULTFILE]
             schema.ResultSchema.from_dict(doc)
@@ -141,20 +142,20 @@ class TestResultSchema(object):
             data_type=pd.DT_INTEGER
         ).to_dict()
         del doc[schema.COLUMN_NAME]
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             schema.ResultColumn.from_dict(doc)
         # - Missing element in sort column dictionary
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             schema.SortColumn.from_dict({'name': 'ABC'})
         # - Invalid data type for column
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             schema.ResultColumn(
                 identifier='col_1',
                 name='Column 1',
                 data_type=pd.DT_LIST
             )
         # - Reference unknown attribute
-        with pytest.raises(ValueError):
+        with pytest.raises(err.InvalidTemplateError):
             schema.ResultSchema.from_dict({
                 schema.SCHEMA_RESULTFILE: 'results.json',
                 schema.SCHEMA_COLUMNS: columns,

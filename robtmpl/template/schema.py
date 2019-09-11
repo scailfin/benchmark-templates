@@ -11,6 +11,7 @@ is part of the extended workflow template specification that is used to define
 benchmarks.
 """
 
+import robtmpl.core.error as err
 import robtmpl.core.util as util
 import robtmpl.template.parameter.declaration as pd
 
@@ -58,12 +59,12 @@ class ResultColumn(object):
 
         Raises
         ------
-        ValueError
+        robtmpl.core.error.InvalidTemplateError
         """
         # Raise error if the data type value is not in the list of supported
         # data types
         if not data_type in DATA_TYPES:
-            raise ValueError('unknown data type \'{}\''.format(data_type))
+            raise err.InvalidTemplateError('unknown data type \'{}\''.format(data_type))
         self.identifier = identifier
         self.name = name
         self.data_type = data_type
@@ -86,14 +87,17 @@ class ResultColumn(object):
 
         Raises
         ------
-        ValueError
+        robtmpl.core.error.InvalidTemplateError
         """
         # Validate the serialization dictionary
-        util.validate_doc(
-            doc,
-            mandatory_labels=[COLUMN_ID, COLUMN_NAME, COLUMN_TYPE],
-            optional_labels=[COLUMN_REQUIRED]
-        )
+        try:
+            util.validate_doc(
+                doc,
+                mandatory_labels=[COLUMN_ID, COLUMN_NAME, COLUMN_TYPE],
+                optional_labels=[COLUMN_REQUIRED]
+            )
+        except ValueError as ex:
+            raise err.InvalidTemplateError(str(ex))
         # Return instance of the column object
         return ResultColumn(
             identifier=doc[COLUMN_ID],
@@ -162,14 +166,17 @@ class ResultSchema(object):
 
         Raises
         ------
-        ValueError
+        robtmpl.core.error.InvalidTemplateError
         """
         # Validate the serialization dictionary
-        util.validate_doc(
-            doc,
-            mandatory_labels=[SCHEMA_RESULTFILE, SCHEMA_COLUMNS],
-            optional_labels=[SCHEMA_ORDERBY]
-        )
+        try:
+            util.validate_doc(
+                doc,
+                mandatory_labels=[SCHEMA_RESULTFILE, SCHEMA_COLUMNS],
+                optional_labels=[SCHEMA_ORDERBY]
+            )
+        except ValueError as ex:
+            raise err.InvalidTemplateError(str(ex))
         # Identifier of the output file that contains the result object
         file_id = doc[SCHEMA_RESULTFILE]
         # Get column list. Ensure that all column names and identifier are
@@ -180,11 +187,11 @@ class ResultSchema(object):
         for col in columns:
             if col.identifier in ids:
                 msg = 'duplicate column identifier \'{}\''
-                raise ValueError(msg.format(col.identifier))
+                raise err.InvalidTemplateError(msg.format(col.identifier))
             ids.add(col.identifier)
             if col.name in names:
                 msg = 'not unique column name \'{}\''
-                raise ValueError(msg.format(col.name))
+                raise err.InvalidTemplateError(msg.format(col.name))
             names.add(col.name)
         # Get optional default sort statement for the ranking
         order_by = list()
@@ -194,7 +201,7 @@ class ResultSchema(object):
                 col = SortColumn.from_dict(c)
                 if not col.identifier in ids:
                     msg = 'unknown column \'{}\''
-                    raise ValueError(msg.format(col.identifier))
+                    raise err.InvalidTemplateError(msg.format(col.identifier))
                 order_by.append(col)
         # Return benchmark schema object
         return ResultSchema(
@@ -254,14 +261,17 @@ class SortColumn(object):
 
         Raises
         ------
-        ValueError
+        robtmpl.core.error.InvalidTemplateError
         """
         # Validate the serialization dictionary
-        util.validate_doc(
-            doc,
-            mandatory_labels=[SORT_ID],
-            optional_labels=[SORT_DESC]
-        )
+        try:
+            util.validate_doc(
+                doc,
+                mandatory_labels=[SORT_ID],
+                optional_labels=[SORT_DESC]
+            )
+        except ValueError as ex:
+            raise err.InvalidTemplateError(str(ex))
         sort_desc = None
         if SORT_DESC in doc:
             sort_desc = doc[SORT_DESC]
