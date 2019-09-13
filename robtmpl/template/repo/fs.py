@@ -228,7 +228,7 @@ class TemplateFSRepository(TemplateRepository):
         robtmpl.error.UnknownTemplateError
         """
         # The underlying object store will raise an UnknownObjectError if the
-        # templaet is unknown. 
+        # templaet is unknown.
         try:
             return WorkflowTemplate.from_dict(self.store.read(identifier))
         except err.UnknownObjectError:

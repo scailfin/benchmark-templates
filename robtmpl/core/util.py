@@ -115,6 +115,10 @@ def to_datetime(timestamp):
     datatime.datetime
         Datetime object
     """
+    # Do nothing if the timestamp is None
+    if timestamp is None:
+        return None
+    # Assumes a string in ISO format (with or without milliseconds)
     try:
         return datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%f')
     except ValueError:
