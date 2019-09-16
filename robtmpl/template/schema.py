@@ -12,7 +12,7 @@ benchmarks.
 """
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 import robtmpl.template.parameter.declaration as pd
 
 

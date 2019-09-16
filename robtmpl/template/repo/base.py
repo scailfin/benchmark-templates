@@ -13,7 +13,7 @@ repository.
 
 from abc import abstractmethod
 
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 """ "Default value for max. attempts parameters."""

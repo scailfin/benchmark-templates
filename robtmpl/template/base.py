@@ -25,7 +25,7 @@ have been replaced by parameter values.
 from robtmpl.template.schema import ResultSchema
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 import robtmpl.template.parameter.util as wfputil
 import robtmpl.template.util as tmplutil
 

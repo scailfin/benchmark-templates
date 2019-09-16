@@ -20,7 +20,7 @@ import os
 import shutil
 
 from robtmpl.io.files.base import FileHandle
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 class Filestore(object):

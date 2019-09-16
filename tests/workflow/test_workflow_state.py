@@ -17,7 +17,7 @@ from robtmpl.workflow.state.base import (
 )
 from robtmpl.workflow.resource import FileResource
 
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 class TestWorkflowStates(object):

@@ -12,7 +12,7 @@ import pytest
 
 from robtmpl.workflow.resource import FileResource
 
-import robtmpl.core.util as util
+import robtmpl.util as util
 import robtmpl.workflow.state.base as state
 import robtmpl.workflow.state.serializer as serialize
 

@@ -17,7 +17,7 @@ from robtmpl.workflow.engine.base import WorkflowEngine
 from robtmpl.workflow.serial import SerialWorkflow
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 import robtmpl.workflow.state.serializer as serialize
 
 

@@ -13,9 +13,9 @@ import os
 import pytest
 
 from robtmpl.io.files.store import Filestore
-from robtmpl.core.tests import FakeStream
+from robtmpl.tests import FakeStream
 
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

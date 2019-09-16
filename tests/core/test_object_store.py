@@ -17,7 +17,7 @@ from robtmpl.io.store.base import ObjectStore
 from robtmpl.io.store.json import JsonFileStore
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

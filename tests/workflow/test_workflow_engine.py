@@ -20,7 +20,7 @@ from robtmpl.workflow.engine.base import WorkflowEngine
 from robtmpl.workflow.engine.sync import SyncWorkflowEngine
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 DIR = os.path.dirname(os.path.realpath(__file__))

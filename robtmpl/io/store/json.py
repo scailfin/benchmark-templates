@@ -13,7 +13,7 @@ import os
 from robtmpl.io.store.base import ObjectStore
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 
 
 class JsonFileStore(ObjectStore):

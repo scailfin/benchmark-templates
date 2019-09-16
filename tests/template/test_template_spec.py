@@ -18,7 +18,7 @@ from robtmpl.template.parameter.value import TemplateArgument
 from robtmpl.template.base import WorkflowTemplate
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 import robtmpl.template.parameter.declaration as pd
 import robtmpl.template.base as tmpl
 import robtmpl.template.schema as schema

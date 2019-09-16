@@ -20,7 +20,7 @@ from robtmpl.template.base import WorkflowTemplate
 from robtmpl.io.store.json import JsonFileStore
 
 import robtmpl.error as err
-import robtmpl.core.util as util
+import robtmpl.util as util
 import robtmpl.template.repo.base as base
 
 

@@ -18,7 +18,7 @@ file to provide access to the file.
 import os
 from datetime import datetime
 
-from robtmpl.core.util import get_unique_identifier
+from robtmpl.util import get_unique_identifier
 
 
 class FileHandle(object):
