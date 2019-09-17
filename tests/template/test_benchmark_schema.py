@@ -54,6 +54,46 @@ class TestResultSchema(object):
         assert not col.required
         assert type(col.required) == bool
 
+    def test_rename_columns(self):
+        """Test mapping of column names to fixed naming pattern."""
+        columns = [
+            schema.ResultColumn(
+                identifier='attr_1',
+                name='Column 1',
+                data_type=pd.DT_INTEGER
+            ),
+            schema.ResultColumn(
+                identifier='attr_2',
+                name='Column 2',
+                data_type=pd.DT_DECIMAL,
+                required=True
+            ),
+            schema.ResultColumn(
+                identifier='attr_3',
+                name='Column 3',
+                data_type=pd.DT_STRING,
+                required=False
+            )
+        ]
+        s = schema.ResultSchema(columns=columns)
+        # Rename with default prefix 'col'
+        mapping = s.rename()
+        assert len(mapping) == 3
+        for key in ['attr_1', 'attr_2', 'attr_3']:
+            assert key in mapping
+        for key in ['col0', 'col1', 'col2']:
+            assert key in mapping.values()
+        # Rename with different prefix
+        mapping = s.rename(prefix='a')
+        assert len(mapping) == 3
+        for key in ['attr_1', 'attr_2', 'attr_3']:
+            assert key in mapping
+        for key in ['a0', 'a1', 'a2']:
+            assert key in mapping.values()
+        # Rename empty schema
+        mapping = schema.ResultSchema().rename()
+        assert len(mapping) == 0
+
     def test_schema_serialization(self):
         """Test creating schema objects from dictionaries and vice versa."""
         columns = [
@@ -80,6 +120,8 @@ class TestResultSchema(object):
             schema.SCHEMA_COLUMNS: columns
         })
         self.validate_schema(s)
+        assert len(s.get_default_order()) == 1
+        assert s.get_default_order()[0].sort_desc
         # Recreate the object from its serialization
         s = schema.ResultSchema.from_dict(s.to_dict())
         self.validate_schema(s)
@@ -175,6 +217,7 @@ class TestResultSchema(object):
     def validate_schema(self, schema):
         """Validate that the given schema."""
         assert len(schema.columns) == 3
+        assert not schema.is_empty()
         self.validate_column(
             column=schema.columns[0],
             identifier='col_1',
