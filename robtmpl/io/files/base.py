@@ -54,6 +54,11 @@ class FileHandle(object):
         """
         return datetime.utcfromtimestamp(os.path.getctime(self.filepath))
 
+    def delete(self):
+        """Remove the associated file on disk (if it exists)."""
+        if os.path.isfile(self.filepath):
+            os.remove(self.filepath)
+
     @property
     def name(self):
         """Method for accessing the file name.
