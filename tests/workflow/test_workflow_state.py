@@ -13,7 +13,8 @@ import os
 import pytest
 
 from robtmpl.workflow.state.base import (
-    StateError, StatePending, StateRunning, StateSuccess, WorkflowState
+    StateCanceled, StateError, StatePending, StateRunning, StateSuccess,
+    WorkflowState
 )
 from robtmpl.workflow.resource import FileResource
 
@@ -22,6 +23,36 @@ import robtmpl.util as util
 
 class TestWorkflowStates(object):
     """Test instantiating the different workflow state classes."""
+    def test_cancel_state(self):
+        """Test creating instances of the cancel state class."""
+        created_at = dt.datetime.now()
+        started_at = created_at + dt.timedelta(seconds=10)
+        stopped_at = started_at + dt.timedelta(seconds=10)
+        state = StateCanceled(
+            created_at=created_at,
+            started_at=started_at,
+            stopped_at=stopped_at
+        )
+        assert state.is_canceled()
+        assert not state.is_error()
+        assert not state.is_pending()
+        assert not state.is_running()
+        assert not state.is_success()
+        assert not state.is_active()
+        assert state.created_at == created_at
+        assert state.started_at == started_at
+        assert state.stopped_at == stopped_at
+        assert len(state.messages) == 1
+        state = StateCanceled(
+            created_at=created_at,
+            started_at=started_at,
+            stopped_at=stopped_at,
+            messages=['A', 'B', 'C']
+        )
+        assert state.created_at == created_at
+        assert state.started_at == started_at
+        assert state.stopped_at == stopped_at
+        assert len(state.messages) == 3
 
     def test_error_state(self):
         """Test creating instances of the error state class."""
@@ -34,6 +65,7 @@ class TestWorkflowStates(object):
             stopped_at=stopped_at
         )
         assert state.is_error()
+        assert not state.is_canceled()
         assert not state.is_pending()
         assert not state.is_running()
         assert not state.is_success()
@@ -59,6 +91,7 @@ class TestWorkflowStates(object):
         state = StatePending(created_at)
         assert state.is_pending()
         assert state.is_active()
+        assert not state.is_canceled()
         assert not state.is_error()
         assert not state.is_running()
         assert not state.is_success()
@@ -66,6 +99,14 @@ class TestWorkflowStates(object):
         running = state.start()
         assert state.created_at == running.created_at
         assert not running.started_at is None
+        # Cancel pending run
+        canceled = state.cancel()
+        assert canceled.is_canceled()
+        assert len(canceled.messages) == 1
+        canceled = state.cancel(messages=['by', 'user'])
+        assert canceled.is_canceled()
+        assert len(canceled.messages) == 2
+        # Set pending run into error state
         state = StatePending(created_at)
         error = state.error(messages=['there', 'was', 'a', 'error'])
         assert error.is_error()
@@ -79,17 +120,26 @@ class TestWorkflowStates(object):
         assert state.is_active()
         assert state.is_running()
         assert not state.is_pending()
+        assert not state.is_canceled()
         assert not state.is_error()
         assert not state.is_success()
         assert state.created_at == created_at
         assert state.started_at == started_at
-        # Create an exception to get error state from running state
+        # Cancel pending run
+        canceled = state.cancel()
+        assert canceled.is_canceled()
+        assert len(canceled.messages) == 1
+        canceled = state.cancel(messages=['by', 'user'])
+        assert canceled.is_canceled()
+        assert len(canceled.messages) == 2
+        # Set active run into error state
         error = state.error(messages=['Error', 'State'])
         assert error.created_at == state.created_at
         assert error.started_at == state.started_at
         assert len(error.messages) == 2
         assert error.messages[0] == 'Error'
         assert error.messages[1] == 'State'
+        # Set active run to success state
         success = state.success(
             files={'myfile': FileResource('myfile', '/dev/null')}
         )

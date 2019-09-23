@@ -65,6 +65,7 @@ class TestTemplateFSRepository(object):
         template = repo.add_template(src_dir=TEMPLATE_DIR)
         # Validate the template handle
         assert not template.identifier is None
+        assert not template.source_dir is None
         assert template.has_schema()
         schema = template.get_schema()
         assert template.workflow_spec['inputs']['files'] == ['$[[code]]', '$[[names]]']
@@ -131,6 +132,7 @@ class TestTemplateFSRepository(object):
         """Test adding and retrieving templates."""
         repo = TemplateFSRepository(base_dir=str(tmpdir))
         template = repo.add_template(src_dir=TEMPLATE_DIR)
+        assert not template.source_dir is None
         assert template.has_schema()
         assert template.workflow_spec['inputs']['files'] == ['$[[code]]', '$[[names]]']
         assert len(template.parameters) == 4

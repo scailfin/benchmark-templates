@@ -20,6 +20,7 @@ from robtmpl.workflow.resource import FileResource
 
 
 """Definition of state type identifier."""
+STATE_CANCELED = 'CANCELED'
 STATE_ERROR = 'ERROR'
 STATE_PENDING = 'PENDING'
 STATE_RUNNING = 'RUNNING'
@@ -51,6 +52,15 @@ class WorkflowState(object):
         bool
         """
         return self.type_id in [STATE_PENDING, STATE_RUNNING]
+
+    def is_canceled(self):
+        """Returns True if the workflow state is of type CANCELED.
+
+        Returns
+        -------
+        bool
+        """
+        return self.type_id == STATE_CANCELED
 
     def is_error(self):
         """Returns True if the workflow state is of type ERROR.
@@ -87,6 +97,36 @@ class WorkflowState(object):
         bool
         """
         return self.type_id == STATE_SUCCESS
+
+
+class StateCanceled(WorkflowState):
+    """Cancel state representation for a workflow run. The workflow has three
+    timestamps: the workflow creation time, workflow run start time and the
+    time when the workflow was canceled. The state also maintains an optional
+    list of messages.
+    """
+    def __init__(self, created_at, started_at=None, stopped_at=None, messages=None):
+        """Initialize the timestamps that are associated with the workflow
+        state and the optional messages.
+
+        Parameters
+        ----------
+        created_at: datetime.datetime
+            Timestamp of workflow creation
+        started_at: datetime.datetime
+            Timestamp when the workflow started running
+        stopped_at: datetime.datetime, optional
+            Timestamp when workflow was canceled
+        messages: list(string), optional
+            Optional list of messages
+        """
+        super(StateCanceled, self).__init__(
+            type_id=STATE_CANCELED,
+            created_at=created_at
+        )
+        self.started_at = started_at if not started_at is None else created_at
+        self.stopped_at = stopped_at if not stopped_at is None else datetime.now()
+        self.messages = messages if not messages is None else ['canceled at user request']
 
 
 class StateError(WorkflowState):
@@ -136,6 +176,29 @@ class StatePending(WorkflowState):
         super(StatePending, self).__init__(
             type_id=STATE_PENDING,
             created_at=created_at
+        )
+
+    def cancel(self, messages=None):
+        """Get instance of canceled state for a pending wokflow.
+
+        Since the workflow did not start to run the started_at timestamp is set
+        to the current time just like the stopped_at timestamp.
+
+        Parameters
+        ----------
+        messages: list(string), optional
+            Optional list of messages
+
+        Returns
+        -------
+        robtmpl.workflow.state.base.StateCanceled
+        """
+        ts = datetime.now()
+        return StateCanceled(
+            created_at=self.created_at,
+            started_at=ts,
+            stopped_at=ts,
+            messages=messages
         )
 
     def error(self, messages=None):
@@ -194,6 +257,24 @@ class StateRunning(WorkflowState):
             created_at=created_at
         )
         self.started_at = started_at if not started_at is None else datetime.now()
+
+    def cancel(self, messages=None):
+        """Get instance of class cancel state for a running wokflow.
+
+        Parameters
+        ----------
+        messages: list(string), optional
+            Optional list of messages
+
+        Returns
+        -------
+        robtmpl.workflow.state.base.StateCanceled
+        """
+        return StateCanceled(
+            created_at=self.created_at,
+            started_at=self.started_at,
+            messages=messages
+        )
 
     def error(self, messages=None):
         """Get instance of error state for a running wokflow. If the exception

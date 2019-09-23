@@ -53,6 +53,13 @@ def deserialize_state(doc):
             created_at=created_at,
             started_at=util.to_datetime(doc[LABEL_STARTED_AT])
         )
+    elif type_id == state.STATE_CANCELED:
+        return state.StateCanceled(
+            created_at=created_at,
+            started_at=util.to_datetime(doc[LABEL_STARTED_AT]),
+            stopped_at=util.to_datetime(doc[LABEL_FINISHED_AT]),
+            messages=doc[LABEL_MESSAGES]
+        )
     elif type_id == state.STATE_ERROR:
         return state.StateError(
             created_at=created_at,
@@ -94,7 +101,7 @@ def serialize_state(wf_state):
     }
     if wf_state.is_running():
         doc[LABEL_STARTED_AT] = wf_state.started_at.isoformat()
-    elif wf_state.is_error():
+    elif wf_state.is_canceled() or wf_state.is_error():
         doc[LABEL_STARTED_AT] = wf_state.started_at.isoformat()
         doc[LABEL_FINISHED_AT] = wf_state.stopped_at.isoformat()
         doc[LABEL_MESSAGES] = wf_state.messages

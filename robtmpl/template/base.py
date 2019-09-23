@@ -48,9 +48,9 @@ class WorkflowTemplate(object):
     parameter declarations. Parameter declarations are keyed by their unique
     identifier in the dictionary.
 
-    For benchmark templates the generate leader boards a result schema is
-    defined. This schema is used to store the results of different benchmark
-    runs in a database.
+    For benchmark templates, a result schema is defined. This schema is used to
+    store the results of different benchmark runs in a database and to the
+    generate a benchmark leader board.
     """
     def __init__(
         self, workflow_spec, identifier=None, parameters=None,

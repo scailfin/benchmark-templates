@@ -24,6 +24,21 @@ STARTED_AT = '2019-09-16T11:46:31'
 
 class TestWorkflowStateSerializer(object):
     """Unit tests for the serialize/deserialize methods for workflow states."""
+    def test_canceled_state(self):
+        """Test serialization/deserialization of canceled states."""
+        s = state.StateCanceled(
+            created_at=util.to_datetime(CREATED_AT),
+            started_at=util.to_datetime(STARTED_AT),
+            stopped_at=util.to_datetime(FINISHED_AT),
+            messages=['there', 'were', 'errors']
+        )
+        s = serialize.deserialize_state(serialize.serialize_state(s))
+        assert s.is_canceled()
+        assert s.messages == ['there', 'were', 'errors']
+        self.validate_date(s.created_at, util.to_datetime(CREATED_AT))
+        self.validate_date(s.started_at, util.to_datetime(STARTED_AT))
+        self.validate_date(s.stopped_at, util.to_datetime(FINISHED_AT))
+
     def test_error_state(self):
         """Test serialization/deserialization of error states."""
         s = state.StateError(

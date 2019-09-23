@@ -15,8 +15,8 @@ import git
 import os
 import shutil
 
-from robtmpl.template.repo.base import TemplateRepository
 from robtmpl.template.base import WorkflowTemplate
+from robtmpl.template.repo.base import TemplateHandle, TemplateRepository
 from robtmpl.io.store.json import JsonFileStore
 
 import robtmpl.error as err
@@ -108,7 +108,7 @@ class TemplateFSRepository(TemplateRepository):
 
         Returns
         -------
-        robtmpl.template.base.WorkflowHandle
+        robtmpl.template.repo.base.TemplateHandle
 
         Raises
         ------
@@ -150,10 +150,17 @@ class TemplateFSRepository(TemplateRepository):
             if os.path.isfile(filename):
                 # Read template from file. If no error occurs the folder
                 # contains a valid template.
-                template = WorkflowTemplate.from_dict(
+                workflow = WorkflowTemplate.from_dict(
                     doc=util.read_object(filename),
                     identifier=identifier,
                     validate=True
+                )
+                template = TemplateHandle(
+                    workflow_spec=workflow.workflow_spec,
+                    identifier=workflow.identifier,
+                    parameters=workflow.parameters,
+                    result_schema=workflow.result_schema,
+                    source_dir=static_dir
                 )
                 # Store serialized template handle on disk
                 self.store.write(
@@ -221,15 +228,22 @@ class TemplateFSRepository(TemplateRepository):
 
         Returns
         -------
-        robtmpl.template.base.WorkflowHandle
+        robtmpl.template.repo.base.TemplateHandle
 
         Raises
         ------
         robtmpl.error.UnknownTemplateError
         """
         # The underlying object store will raise an UnknownObjectError if the
-        # templaet is unknown.
+        # template is unknown.
         try:
-            return WorkflowTemplate.from_dict(self.store.read(identifier))
+            workflow = WorkflowTemplate.from_dict(self.store.read(identifier))
         except err.UnknownObjectError:
             raise err.UnknownTemplateError(identifier)
+        return TemplateHandle(
+            workflow_spec=workflow.workflow_spec,
+            identifier=workflow.identifier,
+            parameters=workflow.parameters,
+            result_schema=workflow.result_schema,
+            source_dir=self.get_static_dir(identifier)
+        )
