@@ -23,7 +23,7 @@ workflow:
                   --outputfile results/eval.json
     outputs:
       files:
-       - results/predict.txt
+       - results/predictions.txt
        - results/eval.json
 parameters:
     - id: code
