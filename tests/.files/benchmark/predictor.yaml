@@ -6,7 +6,7 @@ workflow:
         - code/analyze.py
         - data/sequences.txt
       parameters:
-        codefile: code/predictor.py
+        codefile: $[[code]]
         inputfile: data/sequences.txt
         outputfile: results/predictions.txt
     workflow:
@@ -15,7 +15,7 @@ workflow:
         steps:
           - environment: 'python:3.7'
             commands:
-              - python code/predictor.py
+              - python "${codefile}"
                   --inputfile "${inputfile}"
                   --outputfile "${outputfile}"
               - python code/analyze.py
@@ -29,7 +29,6 @@ parameters:
     - id: code
       name: 'Code file'
       datatype: file
-      as: code/predictor.py
 results:
     file: results/eval.json
     schema:
