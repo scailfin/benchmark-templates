@@ -1,6 +1,6 @@
-================================================================
-Workflow Templates for Reproducible for Data Analysis Benchmarks
-================================================================
+============================================================
+Workflow Templates for Reproducible Data Analysis Benchmarks
+============================================================
 
 .. image:: https://img.shields.io/pypi/pyversions/benchmark-templates.svg
    :target: https://pypi.org/pypi/benchmark-templates
